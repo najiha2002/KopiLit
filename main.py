@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 
+import customer_home
 import customer_order
 import inventory_management
 import sales_reporting
@@ -41,7 +42,7 @@ def login():
         if user_found:
             st.success(f"Logged in as {user_role}")
             if user_role == "Customer":
-                customer_flow(username)
+                customer_home.flow(username)  # Call the function from the new module
             elif user_role == "Admin":
                 admin_flow()
         else:
