@@ -1,8 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-import customer_home
-import customer_order
+import customer_home  # This is where the customer flow is handled
 import inventory_management
 import sales_reporting
 import user_authentication
@@ -20,8 +19,16 @@ conn = st.connection("gsheets", type=GSheetsConnection)
 # Load users data
 @st.cache_data
 def load_users_data():
-    users_data = conn.read(worksheet="Sheet1")
+    users_data = conn.read(worksheet="User")
     return pd.DataFrame(users_data)
+
+# Initialize session state variables for login state management
+if 'logged_in' not in st.session_state:
+    st.session_state['logged_in'] = False
+if 'user_role' not in st.session_state:
+    st.session_state['user_role'] = None
+if 'username' not in st.session_state:
+    st.session_state['username'] = None
 
 # Login or Register Flow
 def login():
@@ -41,10 +48,11 @@ def login():
         
         if user_found:
             st.success(f"Logged in as {user_role}")
-            if user_role == "Customer":
-                customer_home.flow(username)  # Call the function from the new module
-            elif user_role == "Admin":
-                admin_flow()
+            st.session_state['logged_in'] = True
+            st.session_state['user_role'] = user_role
+            st.session_state['username'] = username
+            # Force a page reload to show the dashboard
+            st.rerun()
         else:
             st.error("Invalid username or password.")
 
@@ -58,7 +66,7 @@ def register():
         if any(user.Username == username for user in users_data.itertuples()):
             st.error("Username already taken. Please choose a different one.")
         else:
-            # Prepare the new user data (order should match the headers in the sheet)
+            # Prepare the new user data
             new_user_data = pd.DataFrame(
                 [
                     {
@@ -70,72 +78,53 @@ def register():
             )
 
             try:
-                # Step 4: Update Google Sheets by appending the new row
+                # Update Google Sheets by appending the new row
                 updated_df = pd.concat([users_data, new_user_data], ignore_index=True)
-                conn.update(worksheet="Sheet1", data=updated_df)  # Ensure to pass the argument in the correct format (single list)
+                conn.update(worksheet="User", data=updated_df)  # Ensure to pass the argument in the correct format
                 st.success("Registration successful! Please login to continue.")
                 
-                # Invalidate cache to ensure fresh data
+                # Clear the cache to ensure fresh data
                 st.cache_data.clear()
                 
             except Exception as e:
                 st.error(f"An error occurred while updating Google Sheets: {e}")
 
-# Sidebar navigation
-st.sidebar.title("Coffee Shop Management System")
-flow_selection = st.sidebar.radio("Navigate", ["Login", "Register"])
-if flow_selection == "Login":
-    login()
-elif flow_selection == "Register":
-    register()
-
-# Seamless Customer Flow
-def customer_flow(username):
-    st.title("Customer Dashboard")
-    st.write("Welcome to your homepage.")
-    
-    st.header("Home")
-    st.write("Here are your history orders, ongoing orders, and latest offerings.")
-    
-    st.header("Menu")
-    customer_order.customer_order(username)
-    
-    st.header("Orders")
-    orders_data = pd.DataFrame(conn.read(worksheet="Orders"))
-    user_orders = orders_data[orders_data['Username'] == username]
-    st.write(user_orders)
-    
-    st.header("Rewards")
-    total_points = sum(order.get("Amount", 0) // 10 for order in user_orders.itertuples())
-    st.write(f"You have {total_points} reward points.")
-    
-    st.header("Account")
-    feedback.collect_feedback()
-
-# Seamless Admin Flow
+# Admin Flow Placeholder
 def admin_flow():
     st.title("Admin Dashboard")
-    st.write("Welcome Admin. Here is the business overview.")
+    st.write("Welcome Admin. Here is your overview.")
     
-    st.header("Home")
-    sales_reporting.sales_report()
-    
-    st.header("Orders")
-    orders_data = pd.DataFrame(conn.read(worksheet="Orders"))
-    st.write(orders_data)
-    payment.payment_admin()
-    
-    st.header("Inventory")
+    st.header("Inventory Management")
     inventory_management.manage_inventory()
     
-    st.header("Promotion")
-    promotions.manage_promotions()
+    st.header("Sales Reporting")
+    sales_reporting.sales_report()
     
-    st.header("Analytics Dashboard")
+    st.header("Analytics")
     analytics_dashboard.analytics()
     
-    st.header("Feedback")
-    feedback.view_feedback()
-    
-    st.header("Account")
-    st.write("Manage account settings.")
+    # Add more admin functionalities as needed
+
+# Main App Flow Control
+if st.session_state['logged_in']:
+    # Show the customer or admin dashboard based on user role
+    if st.session_state['user_role'] == "Customer":
+        customer_home.flow(st.session_state['username'])
+    elif st.session_state['user_role'] == "Admin":
+        admin_flow()
+
+    # Single logout button in the sidebar
+    if st.sidebar.button("Logout"):
+        st.session_state['logged_in'] = False
+        st.session_state['user_role'] = None
+        st.session_state['username'] = None
+        st.experimental_rerun()
+
+else:
+    # Show the login or register page if not logged in
+    st.sidebar.title("Coffee Shop Management System")
+    flow_selection = st.sidebar.radio("Navigate", ["Login", "Register"])
+    if flow_selection == "Login":
+        login()
+    elif flow_selection == "Register":
+        register()
