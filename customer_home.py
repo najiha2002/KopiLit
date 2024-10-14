@@ -21,10 +21,12 @@ def flow(username):
         st.header("Home")
         st.write("Here are your history orders, ongoing orders, and latest offerings.")
 
+    # to start new order
     elif navigation == "Menu":
         st.header("Menu")
         customer_order.customer_order(username)
 
+    # View current/past orders
     elif navigation == "Orders":
         st.header("Orders")
         orders_data = pd.DataFrame(conn.read(worksheet="Order"))

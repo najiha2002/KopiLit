@@ -2,13 +2,7 @@ import streamlit as st
 import pandas as pd
 
 import customer_home  # This is where the customer flow is handled
-import inventory_management
-import sales_reporting
-import user_authentication
-import feedback
-import promotions
-import analytics_dashboard
-import payment
+import admin
 from streamlit_gsheets import GSheetsConnection
 
 st.title("KopiLit: Coffee Shop App")
@@ -89,21 +83,7 @@ def register():
             except Exception as e:
                 st.error(f"An error occurred while updating Google Sheets: {e}")
 
-# Admin Flow Placeholder
-def admin_flow():
-    st.title("Admin Dashboard")
-    st.write("Welcome Admin. Here is your overview.")
-    
-    st.header("Inventory Management")
-    inventory_management.manage_inventory()
-    
-    st.header("Sales Reporting")
-    sales_reporting.sales_report()
-    
-    st.header("Analytics")
-    analytics_dashboard.analytics()
-    
-    # Add more admin functionalities as needed
+
 
 # Main App Flow Control
 if st.session_state['logged_in']:
@@ -111,14 +91,14 @@ if st.session_state['logged_in']:
     if st.session_state['user_role'] == "Customer":
         customer_home.flow(st.session_state['username'])
     elif st.session_state['user_role'] == "Admin":
-        admin_flow()
+        admin.flow()
 
     # Single logout button in the sidebar
     if st.sidebar.button("Logout"):
         st.session_state['logged_in'] = False
         st.session_state['user_role'] = None
         st.session_state['username'] = None
-        st.experimental_rerun()
+        st.rerun()
 
 else:
     # Show the login or register page if not logged in
