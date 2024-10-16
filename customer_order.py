@@ -1,3 +1,5 @@
+# Syuk buat order, so bila orang order nnti dkat stock tolak
+
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 import random

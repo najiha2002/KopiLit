@@ -1,3 +1,7 @@
+# Syuk connectkan inventory dgan db dulu (googlesheet)
+# Lepas dh connect db connect dgan order page so kena ada function orderminus (tolak order)
+# Function ni akan dicall oleh page order, pastu run dkat sini utk tolak equal to the amount yg order
+
 import streamlit as st
 
 def manage_inventory():
