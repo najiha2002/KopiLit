@@ -54,6 +54,9 @@ def login():
 
 def register():
     st.title("Register as Customer")
+    first_name = st.text_input("First Name")
+    last_name = st.text_input("Last Name")
+    email = st.text_input("Email")
     username = st.text_input("Create Username")
     password = st.text_input("Create Password", type="password")
     
@@ -66,6 +69,9 @@ def register():
             new_user_data = pd.DataFrame(
                 [
                     {
+                        "First Name": first_name,
+                        "Last Name": last_name,
+                        "Email": email,
                         "Username": username,
                         "Password": password,
                         "Role": "Customer"

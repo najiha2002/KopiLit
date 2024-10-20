@@ -14,25 +14,27 @@ def view_orders():
     try:
         orders_data = conn.read(worksheet="Order")  # Replace "Order" with your actual worksheet name
         orders_df = pd.DataFrame(orders_data)
+        orders_df = orders_df.sort_values(by="Timestamp", ascending=False)
         
         # Check if there are any orders
         if not orders_df.empty:
             # Display the order data in a table
             st.write("Below are the orders placed by customers:")
             st.dataframe(orders_df)
+            pending_orders = orders_df[orders_df["Status"] != "Completed"]
             
             # Filter by Order ID to update status
-            order_id = st.selectbox("Select an Order ID to update status", orders_df["Order ID"].unique())
-            order_details = orders_df[orders_df["Order ID"] == order_id]
+            booking_num = st.selectbox("Select a Booking Number to update status", pending_orders["Booking Number"].unique())
+            order_details = orders_df[orders_df["Booking Number"] == booking_num]
             st.write("Order Details:", order_details)
             
             # Select new status for the order
-            new_status = st.selectbox("Change Order Status", ["Pending", "Completed", "Cancelled"])
+            new_status = st.selectbox("Change Order Status", ["Pending", "Processing", "Ready for Pickup", "Completed", "Cancelled"])
             
             # Update button to apply changes
             if st.button("Update Status"):
                 # Update the status in the DataFrame
-                orders_df.loc[orders_df["Order ID"] == order_id, "Status"] = new_status
+                orders_df.loc[orders_df["Booking Number"] == booking_num, "Status"] = new_status
 
                 # Update the Google Sheet with the modified DataFrame
                 try:

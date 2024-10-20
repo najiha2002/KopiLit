@@ -10,11 +10,16 @@ from streamlit_gsheets import GSheetsConnection
 conn = st.connection("gsheets", type=GSheetsConnection)
 
 def flow(username):
+
+    user_df = pd.DataFrame(conn.read(worksheet="User"))
+    user_data = user_df[user_df['Username'] == username]
+    first_name = user_data['First Name'].iloc[0]
+    
     st.title("Customer Dashboard")
-    st.write(f"Welcome, {username}!")
+    st.write(f"Welcome, {first_name}!")
 
     # Sidebar navigation options
-    st.sidebar.title(f"Hi, {username}!")
+    st.sidebar.title(f"Hi, {first_name}!")
     navigation = st.sidebar.selectbox("Navigate", ["Home", "Menu", "Orders", "Rewards", "Account"])
 
     if navigation == "Home":
