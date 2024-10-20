@@ -76,6 +76,7 @@ def customer_order(username):
                     "Coffee Type": item['Coffee Type'],
                     "Size": item['Size'],
                     "Add-ons": item['Add-ons'],
+                    "Quantity": quantity,
                     "Status": "Pending"
                 })
 
