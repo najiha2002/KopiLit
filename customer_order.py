@@ -1,5 +1,3 @@
-# Syuk buat order, so bila orang order nnti dkat stock tolak
-
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 import random
@@ -51,7 +49,15 @@ def customer_order(username):
     else:
         total_price = 0
         for idx, item in enumerate(st.session_state.cart):
-            st.write(f"{idx + 1}. {item['Coffee Type']} ({item['Size']}), Add-ons: {item['Add-ons']}, Price: ${item['Price']}")
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                st.write(f"{item['Coffee Type']} ({item['Size']}), Add-ons: {item['Add-ons']}, Quantity: {item['Quantity']}, Price: ${item['Price']}")
+            with col2:
+                # Individual remove button for each cart item
+                if st.button(f"Remove", key=f"remove_{idx}"):
+                    st.session_state.cart.pop(idx)
+                    st.rerun()  # Re-run to update the UI after removal
+
             total_price += item['Price']
 
         st.write(f"**Total Price: ${total_price:.2f}**")
@@ -76,7 +82,7 @@ def customer_order(username):
                     "Coffee Type": item['Coffee Type'],
                     "Size": item['Size'],
                     "Add-ons": item['Add-ons'],
-                    "Quantity": quantity,
+                    "Quantity": item['Quantity'],
                     "Status": "Pending"
                 })
 
