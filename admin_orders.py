@@ -4,6 +4,8 @@ import streamlit as st
 import pandas as pd
 from streamlit_gsheets import GSheetsConnection
 
+import datetime
+
 # Assuming `conn` is the Google Sheets connection
 conn = st.connection("gsheets", type=GSheetsConnection)
 
@@ -39,8 +41,22 @@ def view_orders():
                 # Update the Google Sheet with the modified DataFrame
                 try:
                     conn.update(worksheet="Order", data=orders_df)
-                    st.success("Order status updated successfully!")
+
+                    # Create a new notification for the customer
+                    customer_username = order_details["Username"].iloc[0]
+                    notification = {
+                        "Recipient": customer_username,  # Notify customer
+                        "Sender": "Admin",
+                        "Message": f"Your order #{booking_num} status has been updated to {new_status}",
+                        "Timestamp": datetime.datetime.now()
+                    }
                     
+                    notifications_df = pd.DataFrame(conn.read(worksheet="Notifications"))
+                    new_notifications_df = pd.concat([notifications_df, pd.DataFrame([notification])], ignore_index=True)
+                    conn.update(worksheet="Notifications", data=new_notifications_df)
+                    
+                    st.success("Order status updated and customer notified!")
+
                     # Optionally clear cache to ensure fresh data on reload
                     st.cache_data.clear()
                 

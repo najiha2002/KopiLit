@@ -83,7 +83,9 @@ def customer_order(username):
                     "Size": item['Size'],
                     "Add-ons": item['Add-ons'],
                     "Quantity": item['Quantity'],
-                    "Status": "Pending"
+                    "Status": "Pending",
+                    "Price": total_price
+                    
                 })
 
             new_order_df = pd.DataFrame(new_orders)
@@ -98,6 +100,22 @@ def customer_order(username):
 
                 # Clear the cart
                 st.session_state.cart = []
+
+                # Create a new notification for the admin
+                notification = {
+                    "Recipient": "Admin",  # Notify Admin
+                    "Sender": username,
+                    "Message": f"New order placed by {username}",
+                    "Timestamp": datetime.datetime.now()
+                }
+
+                new_notifications_df = pd.DataFrame([notification])
+
+                # Append the notification to the Notifications sheet
+                notifications_df = pd.DataFrame(conn.read(worksheet="Notifications"))
+                updated_notifications_df = pd.concat([notifications_df, new_notifications_df], ignore_index=True)
+                conn.update(worksheet="Notifications", data=updated_notifications_df)
+                st.success("Order placed and admin notified!")
 
                 # Optionally clear the cache to ensure fresh data on reload
                 st.cache_data.clear()
