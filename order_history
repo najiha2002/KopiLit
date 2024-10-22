@@ -1,0 +1,24 @@
+import streamlit as st
+from streamlit_gsheets import GSheetsConnection
+import pandas as pd
+
+import user_authentication
+
+# Create a connection object for Google Sheets
+conn = st.connection("gsheets", type=GSheetsConnection)
+
+def view_order():
+    st.header("View your past order here")
+
+    # Connect to the "Order" worksheet
+    order_sheet = conn.read(worksheet="Order")  # Adjust to your actual worksheet name
+    order_df = pd.DataFrame(order_sheet)  # Convert the data to a DataFrame
+
+    # Ensure the DataFrame has the expected structure (assuming columns 'Item' and 'Stock')
+    if 'Username' in order_df.columns == user_authentication.username and 'Status' in order_df.columns == 'Completed':
+        st.write('Details of order')
+        st.write('Order No.: ','Booking Number' in order_df.columns)
+        st.write('Coffee Type: ','Coffee Type' in order_df.columns)
+        st.write('Quantity','Quantity' in order_df.columns)
+        st.write('Total Price', 'Price' in order_df.columns)
+        
