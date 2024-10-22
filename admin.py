@@ -6,6 +6,8 @@ import admin_orders
 import inventory_management
 import sales_reporting
 import analytics_dashboard
+import feedback
+import promotions
 
 # Admin Flow Placeholder
 def flow():
@@ -15,7 +17,7 @@ def flow():
     # Sidebar navigation options
     st.sidebar.title(f"Hi, admin!")
    # Admin Sidebar Navigation
-    navigation = st.sidebar.selectbox("Navigate", ["Orders", "Inventory Management", "Sales Reporting", "Analytics"])
+    navigation = st.sidebar.selectbox("Navigate", ["Orders", "Inventory Management", "Sales Reporting", "Analytics", "Feedback", "Promotions"])
     
     # Conditionally display sections based on navigation selection
 
@@ -33,3 +35,11 @@ def flow():
     elif navigation == "Analytics":
         st.header("Analytics")
         analytics_dashboard.analytics()
+    
+    elif navigation == "Customer Feedback":
+        st.header("Customer Feedback")
+        feedback.view_feedback()
+
+    elif navigation == "Promotions":
+        st.header("Manage Promotion")
+        promotions.manage_promotions()
