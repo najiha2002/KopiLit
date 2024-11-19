@@ -12,6 +12,7 @@ def analytics():
     st.write("Total Orders Today: 50")
     st.write("Items Running Low: Coffee Beans, Cups")
     inventory_data = pd.DataFrame(conn.read(worksheet="Inventory"))
+    user_data = pd.DataFrame(conn.read(worksheet="User"))
 
     # Bar Chart of Total Sales by Coffee Type
     if 'Status' in sales_data.columns == 'Completed' :
@@ -44,6 +45,11 @@ def analytics():
 
     
     # Bar Chart of User Preference on Coffee Type (Ordered)
+
+
+    # Distribution of Customer Gender 
+
+
     
 
     
