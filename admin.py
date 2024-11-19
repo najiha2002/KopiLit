@@ -45,7 +45,6 @@ def check_notifications():
         st.sidebar.error(f"Error fetching notifications: {e}")
 
 
-
 # Admin Flow Placeholder
 def flow():
     st.title("Admin Dashboard")
