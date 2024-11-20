@@ -4,6 +4,8 @@ import pandas as pd
 import plotly.express as px
 
 conn = st.connection("gsheets", type=GSheetsConnection)
+
+
 # Establish Google Sheets connection
 def analytics():
     sales_data = pd.DataFrame(conn.read(worksheet="Order"))
@@ -46,23 +48,23 @@ def analytics():
     
     # Bar Chart of User Preference on Coffee Type (Ordered)
     # Bar Chart of User Preference on Coffee Type (Ordered)
-if 'coffee_type' in sales_data.columns and 'quantity' in sales_data.columns and 'status' in sales_data.columns:
-    # Filter the data for completed orders
-    completed_orders = sales_data[sales_data['status'] == 'completed']
-    
-    # Convert the quantity column to numeric, in case it contains string values
-    completed_orders['quantity'] = pd.to_numeric(completed_orders['quantity'], errors='coerce')
-    
-    # Create a bar chart using Plotly
-    fig2 = px.bar(completed_orders, x='coffee_type', y='quantity', title='User Preference on Coffee Type (Completed Orders)',
-                  labels={'quantity': 'Quantity', 'coffee_type': 'Coffee Type'})
-    
-    # Display the bar chart in Streamlit
-    with st.expander("User Preference on Coffee Type (Completed Orders)"):
-        st.plotly_chart(fig2, use_container_width=True)
+    if 'coffee_type' in sales_data.columns and 'quantity' in sales_data.columns and 'status' in sales_data.columns:
+        # Filter the data for completed orders
+        completed_orders = sales_data[sales_data['status'] == 'completed']
+        
+        # Convert the quantity column to numeric, in case it contains string values
+        completed_orders['quantity'] = pd.to_numeric(completed_orders['quantity'], errors='coerce')
+        
+        # Create a bar chart using Plotly
+        fig2 = px.bar(completed_orders, x='coffee_type', y='quantity', title='User Preference on Coffee Type (Completed Orders)',
+                    labels={'quantity': 'Quantity', 'coffee_type': 'Coffee Type'})
+        
+        # Display the bar chart in Streamlit
+        with st.expander("User Preference on Coffee Type (Completed Orders)"):
+            st.plotly_chart(fig2, use_container_width=True)
 
 
-    # Distribution of Customer Gender 
+        # Distribution of Customer Gender 
 
 
     
