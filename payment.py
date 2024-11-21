@@ -45,3 +45,5 @@ def payment_user():
             st.success("Payment successful! Your order has been confirmed.")
             st.write("You can view or download your invoice below.")
             st.download_button(label="Download Invoice", data="Invoice details here", file_name="invoice.txt")
+
+payment_user()
