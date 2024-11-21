@@ -131,9 +131,6 @@ def flow(username):
     first_name = user_data['First Name'].iloc[0]
 
     check_notifications(username)
-    
-    #st.title("Customer Dashboard")
-    st.title(f"Welcome, {first_name}!", anchor="welcome")
 
     image_url = "https://i.ibb.co/rbPn1vt/kopilit.png"  
     # Add the image to the sidebar
@@ -150,7 +147,6 @@ def flow(username):
 
     # to start new order
     elif navigation == "Menu":
-        st.header("Menu")
         customer_order.customer_order(username)
 
     # View current/past orders

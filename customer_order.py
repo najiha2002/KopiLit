@@ -1,129 +1,3 @@
-# import streamlit as st
-# from streamlit_gsheets import GSheetsConnection
-# import random
-# import pandas as pd
-# import datetime
-
-# # Create a connection object
-# conn = st.connection("gsheets", type=GSheetsConnection)
-
-# # Initialize session state for the cart if it doesn't exist
-# if 'cart' not in st.session_state:
-#     st.session_state.cart = []
-
-# def customer_order(username):
-#     st.title("Customer Order")
-#     coffee_menu = {
-#         "Americano": 3.00,
-#         "Cappuccino": 3.50,
-#         "Latte": 4.00,
-#         "Caramel Macchiato": 4.50
-#     }
-
-#     st.header("Menu")
-#     for coffee, price in coffee_menu.items():
-#         st.write(f"{coffee}: ${price}")
-
-#     coffee_type = st.selectbox("Select your coffee", list(coffee_menu.keys()))
-#     size = st.selectbox("Select size", ["Small", "Medium", "Large"])
-#     add_ons = st.multiselect("Select add-ons", ["Extra Sugar", "Milk", "Whipped Cream"])
-#     quantity = st.number_input("Quantity", min_value=1)
-
-#     # Calculate price based on coffee type and size
-#     size_multiplier = {"Small": 1, "Medium": 1.5, "Large": 2}
-#     price = coffee_menu[coffee_type] * size_multiplier[size]
-
-#     if st.button("Add to Cart"):
-#         st.session_state.cart.append({
-#             "Coffee Type": coffee_type,
-#             "Size": size,
-#             "Add-ons": ', '.join(add_ons),
-#             "Quantity": quantity,
-#             "Price": (price * quantity)
-#         })
-#         st.success(f"{coffee_type} added to cart!")
-
-#     st.header("Your Cart")
-#     if len(st.session_state.cart) == 0:
-#         st.write("Your cart is empty.")
-#     else:
-#         total_price = 0
-#         for idx, item in enumerate(st.session_state.cart):
-#             col1, col2 = st.columns([3, 1])
-#             with col1:
-#                 st.write(f"{item['Coffee Type']} ({item['Size']}), Add-ons: {item['Add-ons']}, Quantity: {item['Quantity']}, Price: ${item['Price']}")
-#             with col2:
-#                 # Individual remove button for each cart item
-#                 if st.button(f"Remove", key=f"remove_{idx}"):
-#                     st.session_state.cart.pop(idx)
-#                     st.rerun()  # Re-run to update the UI after removal
-
-#             total_price += item['Price']
-
-#         st.write(f"**Total Price: ${total_price:.2f}**")
-
-#         if st.button("Place Order"):
-#             orders_data = conn.read(worksheet="Order")
-#             orders_df = pd.DataFrame(orders_data)
-
-#             timestamp = datetime.datetime.now()
-#             booking_number = str(random.randint(1000, 9999))
-#             estimated_time = "5-10 minutes"
-#             st.success(f"Order placed successfully! Your booking number is #{booking_number}. Estimated preparation time: {estimated_time}")
-
-#             # Add cart items to Google Sheets
-#             new_orders = []
-#             for item in st.session_state.cart:
-#                 new_orders.append({
-#                     "Booking Number": booking_number,
-#                     "Timestamp": timestamp,
-#                     "Username": username,
-#                     "Order Type": "Order",
-#                     "Coffee Type": item['Coffee Type'],
-#                     "Size": item['Size'],
-#                     "Add-ons": item['Add-ons'],
-#                     "Quantity": item['Quantity'],
-#                     "Status": "Pending",
-#                     "Price": total_price
-                    
-#                 })
-
-#             new_order_df = pd.DataFrame(new_orders)
-
-#             try:
-#                 # Append the new orders to the existing orders data
-#                 updated_orders_df = pd.concat([orders_df, new_order_df], ignore_index=True)
-
-#                 # Update the Google Sheets Order worksheet with the updated DataFrame
-#                 conn.update(worksheet="Order", data=updated_orders_df)
-#                 st.success("All items in the cart have been ordered!")
-
-#                 # Clear the cart
-#                 st.session_state.cart = []
-
-#                 # Create a new notification for the admin
-#                 notification = {
-#                     "Recipient": "Admin",  # Notify Admin
-#                     "Sender": username,
-#                     "Message": f"New order placed by {username}",
-#                     "Timestamp": datetime.datetime.now()
-#                 }
-
-#                 new_notifications_df = pd.DataFrame([notification])
-
-#                 # Append the notification to the Notifications sheet
-#                 notifications_df = pd.DataFrame(conn.read(worksheet="Notifications"))
-#                 updated_notifications_df = pd.concat([notifications_df, new_notifications_df], ignore_index=True)
-#                 conn.update(worksheet="Notifications", data=updated_notifications_df)
-#                 st.success("Order placed and admin notified!")
-
-#                 # Optionally clear the cache to ensure fresh data on reload
-#                 st.cache_data.clear()
-
-#             except Exception as e:
-#                 st.error(f"An error occurred while updating Google Sheets: {e}")
-
-
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 import random
@@ -138,7 +12,9 @@ if 'cart' not in st.session_state:
     st.session_state.cart = []
 
 def customer_order(username):
-    st.title("Customer Order")
+    st.title("☕ Customer Order")
+
+    # Coffee menu with emojis
     coffee_menu = {
         "Americano": 3.00,
         "Cappuccino": 3.50,
@@ -146,20 +22,25 @@ def customer_order(username):
         "Caramel Macchiato": 4.50
     }
 
-    st.header("Menu")
+    # Display the menu
+    st.markdown("### 📋 Menu")
     for coffee, price in coffee_menu.items():
-        st.write(f"{coffee}: ${price}")
+        st.write(f"{coffee}: **${price:.2f}**")
 
+    # Order selection form
+    st.markdown("---")
+    st.markdown("### 🛒 Place Your Order")
     coffee_type = st.selectbox("Select your coffee", list(coffee_menu.keys()))
     size = st.selectbox("Select size", ["Small", "Medium", "Large"])
     add_ons = st.multiselect("Select add-ons", ["Extra Sugar", "Milk", "Whipped Cream"])
-    quantity = st.number_input("Quantity", min_value=1)
+    quantity = st.number_input("Quantity", min_value=1, step=1)
 
     # Calculate price based on coffee type and size
     size_multiplier = {"Small": 1, "Medium": 1.5, "Large": 2}
     price = coffee_menu[coffee_type] * size_multiplier[size]
 
-    if st.button("Add to Cart"):
+    # Add to cart button
+    if st.button("Add to Cart 🛒"):
         st.session_state.cart.append({
             "Coffee Type": coffee_type,
             "Size": size,
@@ -169,33 +50,80 @@ def customer_order(username):
         })
         st.success(f"{coffee_type} added to cart!")
 
-    st.header("Your Cart")
+    # Display the cart
+    st.markdown("---")
+    st.markdown("### 🧾 Your Cart")
     if len(st.session_state.cart) == 0:
-        st.write("Your cart is empty.")
+        st.info("Your cart is empty. Add items to place an order.")
     else:
         total_price = 0
+        # Display cart items in a structured format
         for idx, item in enumerate(st.session_state.cart):
-            col1, col2 = st.columns([3, 1])
-            with col1:
-                st.write(f"{item['Coffee Type']} ({item['Size']}), Add-ons: {item['Add-ons']}, Quantity: {item['Quantity']}, Price: ${item['Price']}")
-            with col2:
-                # Individual remove button for each cart item
-                if st.button(f"Remove", key=f"remove_{idx}"):
-                    st.session_state.cart.pop(idx)
-                    st.rerun()
+            with st.container():
+                col1, col2, col3, col4 = st.columns([3, 2, 1, 1])
 
-            total_price += item['Price']
+                # Display item details
+                with col1:
+                    st.markdown(
+                        f"**{item['Coffee Type']}** ({item['Size']})"
+                    )
+                    st.caption(f"Add-ons: {item['Add-ons'] or 'None'}")
+                
+                # Quantity
+                with col2:
+                    st.markdown(f"**Quantity:** {item['Quantity']}")
 
-        st.write(f"**Total Price: ${total_price:.2f}**")
+                # Price
+                with col3:
+                    st.markdown(f"**Price:** ${item['Price']:.2f}")
 
-        if st.button("Place Order"):
+                # Remove Button
+                with col4:
+                    if st.button("❌ Remove", key=f"remove_{idx}"):
+                        st.session_state.cart.pop(idx)
+                        st.rerun()
+
+                # Accumulate total price
+                total_price += item['Price']
+
+        # Promo Code Section inside an Expander
+        st.markdown("---")
+        with st.expander("🎟️ Apply Promo Code"):
+            promo_code = st.text_input("Enter your promo code:")
+            discount = 0
+
+            # Check promo code from the Promotion sheet
+            try:
+                promotion_data = conn.read(worksheet="Promotion")
+                promotion_df = pd.DataFrame(promotion_data)
+                if promo_code in promotion_df["name"].values:
+                    promo_details = promotion_df[promotion_df["name"] == promo_code].iloc[0]
+                    discount = promo_details["discount"] / 100 * total_price
+                    st.success(f"Promo code applied! You saved ${discount:.2f}.")
+                elif promo_code:
+                    st.error("Invalid promo code. Please try again.")
+            except Exception as e:
+                st.error(f"Error fetching promo code data: {e}")
+
+
+        # Calculate final price after discount
+        final_price = total_price - discount
+        st.markdown("---")
+        st.markdown(f"#### 🏷️ **Total Price: ${final_price:.2f}**")
+
+        # Loyalty Points Calculation
+        loyalty_points = int(final_price)  # 1 point per $1 spent
+        st.markdown(f"##### 🌟 **Loyalty Points Earned: {loyalty_points} points**")
+
+        # Place Order button
+        if st.button("Place Order ✅"):
             orders_data = conn.read(worksheet="Order")
             orders_df = pd.DataFrame(orders_data)
 
+            # Generate booking details
             timestamp = datetime.datetime.now()
             booking_number = str(random.randint(1000, 9999))
             estimated_time = "5-10 minutes"
-            st.success(f"Order placed successfully! Your booking number is #{booking_number}. Estimated preparation time: {estimated_time}")
 
             # Add cart items to Google Sheets
             new_orders = []
@@ -210,18 +138,21 @@ def customer_order(username):
                     "Add-ons": item['Add-ons'],
                     "Quantity": item['Quantity'],
                     "Status": "Pending",
-                    "Price": total_price
+                    "Price": total_price,
+                    "Final Price": final_price,
+                    "Promo Code": promo_code,
+                    "Loyalty Points": loyalty_points 
                 })
 
             new_order_df = pd.DataFrame(new_orders)
 
             try:
-                # Fetch the latest inventory data
+                # Fetch inventory data
                 inventory_data = conn.read(worksheet="Inventory")
                 inventory_df = pd.DataFrame(inventory_data)
                 inventory_dict = {row['Item']: row['Stock'] for _, row in inventory_df.iterrows()}
 
-                # Define ingredient requirements for each coffee type
+                # Ingredient requirements
                 ingredient_requirements = {
                     "Americano": {"Coffee Beans": 1},
                     "Cappuccino": {"Coffee Beans": 1, "Milk": 0.5},
@@ -229,7 +160,7 @@ def customer_order(username):
                     "Caramel Macchiato": {"Coffee Beans": 1, "Milk": 1, "Caramel Syrup": 0.5},
                 }
 
-                # Calculate total ingredient requirements based on the cart
+                # Calculate total ingredient requirements
                 required_ingredients = {}
                 for item in st.session_state.cart:
                     coffee_type = item['Coffee Type']
@@ -238,50 +169,45 @@ def customer_order(username):
                         for ingredient, amount in ingredient_requirements[coffee_type].items():
                             required_ingredients[ingredient] = required_ingredients.get(ingredient, 0) + amount * quantity
 
-                # Check if inventory is sufficient
+                # Check and update inventory
                 for ingredient, required_amount in required_ingredients.items():
                     if inventory_dict.get(ingredient, 0) < required_amount:
                         st.error(f"Not enough {ingredient} in stock to fulfill the order.")
                         return
 
-                # Deduct ingredients from inventory
                 for ingredient, required_amount in required_ingredients.items():
                     inventory_dict[ingredient] -= required_amount
 
-                # Update the inventory in Google Sheets
                 updated_inventory_df = pd.DataFrame(
                     [{"Item": item, "Stock": stock} for item, stock in inventory_dict.items()]
                 )
                 conn.update(worksheet="Inventory", data=updated_inventory_df)
 
-                # Append the new orders to the existing orders data
+                # Append orders to sheet
                 updated_orders_df = pd.concat([orders_df, new_order_df], ignore_index=True)
-
-                # Update the Google Sheets Order worksheet with the updated DataFrame
                 conn.update(worksheet="Order", data=updated_orders_df)
-                st.success("All items in the cart have been ordered!")
+                
 
-                # Clear the cart
+                # Clear cart
                 st.session_state.cart = []
 
-                # Create a new notification for the admin
+                # Notify admin about the order
                 notification = {
-                    "Recipient": "Admin",  # Notify Admin
+                    "Recipient": "Admin",
                     "Sender": username,
                     "Message": f"New order placed by {username}",
                     "Timestamp": datetime.datetime.now()
                 }
 
-                new_notifications_df = pd.DataFrame([notification])
-
-                # Append the notification to the Notifications sheet
-                notifications_df = pd.DataFrame(conn.read(worksheet="Notifications"))
-                updated_notifications_df = pd.concat([notifications_df, new_notifications_df], ignore_index=True)
+                notifications_data = conn.read(worksheet="Notifications")
+                notifications_df = pd.DataFrame(notifications_data)
+                updated_notifications_df = pd.concat([notifications_df, pd.DataFrame([notification])], ignore_index=True)
                 conn.update(worksheet="Notifications", data=updated_notifications_df)
-                st.success("Order placed and admin notified!")
-
-                # Optionally clear the cache to ensure fresh data on reload
                 st.cache_data.clear()
+                st.success(
+                    f"Order placed successfully! Your booking number is **#{booking_number}**. "
+                    f"Estimated preparation time: **{estimated_time}**"
+                )
 
             except Exception as e:
                 st.error(f"An error occurred while updating Google Sheets: {e}")

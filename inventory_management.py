@@ -91,6 +91,8 @@ import pandas as pd
 # Create a connection object for Google Sheets
 conn = st.connection("gsheets", type=GSheetsConnection)
 
+
+@st.cache_data
 def fetch_inventory():
     """
     Fetch inventory data from Google Sheets.
@@ -131,6 +133,8 @@ def manage_inventory():
         # Update the Google Sheets Inventory worksheet with the updated DataFrame
         try:
             conn.update(worksheet="Inventory", data=updated_inventory_df)  # Update the inventory worksheet
+            # Clear the cached data to fetch the updated inventory on reload
+            st.cache_data.clear()
             st.success("Inventory updated successfully!")
         except Exception as e:
             st.error(f"An error occurred while updating Google Sheets: {e}")
