@@ -109,6 +109,10 @@ if st.session_state['logged_in']:
         st.rerun()
 
 else:
+    image_url = "https://i.ibb.co/rbPn1vt/kopilit.png"  
+    # Add the image to the sidebar
+    st.sidebar.image(image_url, use_column_width=True)
+
     # Show the login or register page if not logged in
     st.sidebar.title("Coffee Shop Management System")
     flow_selection = st.sidebar.radio("Navigate", ["Login", "Register"])

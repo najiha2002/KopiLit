@@ -135,6 +135,10 @@ def flow(username):
     #st.title("Customer Dashboard")
     st.title(f"Welcome, {first_name}!", anchor="welcome")
 
+    image_url = "https://i.ibb.co/rbPn1vt/kopilit.png"  
+    # Add the image to the sidebar
+    st.sidebar.image(image_url, use_column_width=True)
+    
     # Sidebar navigation options
     st.sidebar.title(f"Hi, {first_name}!")
     navigation = st.sidebar.selectbox("Navigate", ["Home", "Menu", "Orders", "Rewards", "Account"])

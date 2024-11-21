@@ -47,9 +47,11 @@ def check_notifications():
 
 # Admin Flow Placeholder
 def flow():
-    st.title("Admin Dashboard")
-    st.write("Welcome Admin. Here is your overview.")
 
+    image_url = "https://i.ibb.co/rbPn1vt/kopilit.png"  
+    # Add the image to the sidebar
+
+    st.sidebar.image(image_url, use_column_width=True)
     # Check for customer order notifications
     check_notifications()
 
@@ -74,11 +76,9 @@ def flow():
     elif navigation == "Analytics":
         st.header("Analytics")
         analytics_dashboard.analytics()
-    
-    elif navigation == "Customer Feedback":
-        st.header("Customer Feedback")
-        feedback.view_feedback()
 
+    elif navigation == "Feedback":
+        feedback.view_feedback()
+    
     elif navigation == "Promotions":
-        st.header("Manage Promotion")
         promotions.manage_promotions()

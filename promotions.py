@@ -32,7 +32,7 @@ def manage_promotions():
         st.info("No promotions available. Add a new promotion using the form below.")
     else:
         for index, row in promo_df.iterrows():
-            with st.expander(f"Promotion: {row['name']}"):
+            with st.expander(f"Promotion {index + 1}: {row['name']}"):
                 with st.form(f"edit_form_{index}"):
                     # Editable fields for the promotion
                     promo_name = st.text_input("Promotion Name", value=row["name"])

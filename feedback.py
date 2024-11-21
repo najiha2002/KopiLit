@@ -18,24 +18,47 @@ def load_feedback_data():
 # Save feedback data to Google Sheets
 def save_feedback_data(new_feedback):
     try:
+        # Clear cache before fetching fresh data
+        st.cache_data.clear()
         feedback_df = load_feedback_data()
         updated_feedback_df = pd.concat([feedback_df, new_feedback], ignore_index=True)
         conn.update(worksheet="Feedback", data=updated_feedback_df)
         st.success("Thank you for your feedback!")
+        # Clear cache after updating data
+        st.cache_data.clear()
     except Exception as e:
         st.error(f"Failed to save feedback: {e}")
+
+# Load user data to get last names
+@st.cache_data
+def load_users_data():
+    users_data = conn.read(worksheet="User")
+    return pd.DataFrame(users_data)
 
 # Collect customer feedback
 def collect_feedback():
     st.title("Customer Feedback")
     st.write("We value your feedback! Please share your thoughts below.")
     
+    # Get the logged-in user's last name
+    users_data = load_users_data()
+    current_user = st.session_state.get("username")
+    user_row = users_data.loc[users_data["Username"] == current_user]
+    
+    if not user_row.empty:
+        last_name = user_row.iloc[0]["Last Name"]
+        st.write(f"Logged in as: {last_name}")
+    else:
+        last_name = "Unknown User"
+        st.warning("Could not fetch user information. Please log in again.")
+
     feedback_text = st.text_area("Your Feedback")
     rating = st.slider("Rate your experience (1 = Poor, 5 = Excellent)", min_value=1, max_value=5)
     
     if st.button("Submit Feedback"):
         if feedback_text.strip():
             new_feedback = pd.DataFrame([{
+                "Name": last_name,
                 "Feedback": feedback_text,
                 "Rating": rating,
                 "Timestamp": pd.Timestamp.now()
@@ -46,6 +69,7 @@ def collect_feedback():
             st.error("Feedback text cannot be empty.")
 
 # Admin feedback overview
+# Admin feedback overview with analytics visualization
 def view_feedback():
     st.title("Feedback Overview")
     st.write("View all customer feedback and analyze ratings.")
@@ -63,17 +87,38 @@ def view_feedback():
     
     # Check if the required columns exist
     if 'Rating' in feedback_df.columns:
-        # Calculate average rating
+        # Convert Rating column to numeric
         feedback_df['Rating'] = pd.to_numeric(feedback_df['Rating'], errors='coerce')
+        
+        # Calculate average rating
         avg_rating = feedback_df['Rating'].mean()
-        st.write(f"Average Rating: {avg_rating:.2f}/5")
+        st.metric("Average Rating", f"{avg_rating:.2f} / 5")
 
-        # Display rating trend over time (assuming a timestamp column exists)
+        # Distribution of ratings
+        st.subheader("Ratings Distribution")
+        st.bar_chart(feedback_df['Rating'].value_counts().sort_index())
+
+        # Rating trend over time (assuming a timestamp column exists)
         if 'Timestamp' in feedback_df.columns:
             feedback_df['Timestamp'] = pd.to_datetime(feedback_df['Timestamp'], errors='coerce')
             feedback_df = feedback_df.sort_values('Timestamp')
+
+            # Display line chart for rating trend
+            st.subheader("Rating Trend Over Time")
             st.line_chart(feedback_df.set_index('Timestamp')['Rating'])
         else:
             st.warning("Timestamp column is missing for trend analysis.")
     else:
         st.warning("Rating column is missing for statistical analysis.")
+
+    # Display top feedbacks
+    st.subheader("Top Feedback Comments")
+    if 'Feedback' in feedback_df.columns and 'Rating' in feedback_df.columns:
+        top_feedbacks = feedback_df.sort_values(by='Rating', ascending=False).head(5)
+        for _, row in top_feedbacks.iterrows():
+            st.write(f"**Rating:** {row['Rating']} ⭐")
+            st.write(f"**Comment:** {row['Feedback']}")
+            st.write("---")
+    else:
+        st.warning("Feedback or Rating column is missing for detailed comments analysis.")
+
