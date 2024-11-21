@@ -5,6 +5,7 @@ import streamlit as st
 import pandas as pd
 import customer_order
 import feedback
+import rewards
 from streamlit_gsheets import GSheetsConnection
 
 import datetime
@@ -157,12 +158,7 @@ def flow(username):
         st.write(user_orders)
 
     elif navigation == "Rewards":
-        st.header("Rewards")
-        # Assuming each order has an 'Amount' column for calculating rewards
-        orders_data = pd.DataFrame(conn.read(worksheet="Order"))
-        user_orders = orders_data[orders_data['Username'] == username]
-        total_points = sum(order.get("Amount", 0) // 10 for order in user_orders.itertuples())
-        st.write(f"You have {total_points} reward points.")
+        rewards.customer_rewards(username)
 
     elif navigation == "Account":
         st.header("Account")

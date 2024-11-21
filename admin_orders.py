@@ -14,6 +14,7 @@ def view_orders():
     try:
         orders_data = conn.read(worksheet="Order")  # Replace with your actual worksheet name
         orders_df = pd.DataFrame(orders_data)
+        orders_df['Booking Number'] = orders_df['Booking Number'].astype(int)
         orders_df["Timestamp"] = pd.to_datetime(orders_df["Timestamp"])  # Ensure Timestamp is datetime
         orders_df = orders_df.sort_values(by="Timestamp", ascending=False)
 
