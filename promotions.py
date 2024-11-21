@@ -1,33 +1,76 @@
 import streamlit as st
 import pandas as pd
 from streamlit_gsheets import GSheetsConnection
+
+# Establish Google Sheets connection
 conn = st.connection("gsheets", type=GSheetsConnection)
 
 @st.cache_data
 def load_promotions_data():
-    promotion = conn.read(worksheet="Promotion")
-    return pd.DataFrame(promotion)
+    """Load promotions data from Google Sheets."""
+    promotions = conn.read(worksheet="Promotion")
+    return pd.DataFrame(promotions)
 
 def save_promotions_data(dataframe):
-    promotion = conn.read(worksheet="Promotion")
-
-    # Clear the existing data
-    worksheet.clear()
-    
-    # Update the worksheet with new data from the dataframe
-    worksheet.update([dataframe.columns.values.tolist()] + dataframe.values.tolist())
-
-
+    """Save the entire promotions DataFrame to Google Sheets."""
+    try:
+        conn.update(worksheet="Promotion", data=dataframe)
+    except Exception as e:
+        st.error(f"Failed to update promotions: {e}")
 
 def manage_promotions():
-    #st.title("Promotions & Discounts")
-    #st.write("Manage promotional offers and discounts.")
-    #coupon_code = st.text_input("Enter Coupon Code")
-    #discount = st.slider("Discount Percentage", 0, 100)
-    #if st.button("Create Coupon"):
-    #    st.success(f"Coupon {coupon_code} offering {discount}% discount created!")
+    st.title("Promotions & Discounts")
+    st.write("Manage promotional offers and discounts.")
 
-    with st.form("Add Promotion"):
+    # Load existing promotions data
+    promo_df = load_promotions_data()
+
+    # Display existing promotions
+    st.subheader("Existing Promotions")
+    st.write("Edit or remove promotions below:")
+    if promo_df.empty:
+        st.info("No promotions available. Add a new promotion using the form below.")
+    else:
+        for index, row in promo_df.iterrows():
+            with st.expander(f"Promotion: {row['name']}"):
+                with st.form(f"edit_form_{index}"):
+                    # Editable fields for the promotion
+                    promo_name = st.text_input("Promotion Name", value=row["name"])
+                    promo_desc = st.text_area("Promotion Description", value=row["description"])
+                    start_date = st.date_input("Start Date", value=pd.to_datetime(row["start_date"]).date())
+                    end_date = st.date_input("End Date", value=pd.to_datetime(row["end_date"]).date())
+                    discount = st.number_input("Discount (%)", min_value=0, max_value=100, value=int(row["discount"]))
+                    
+                    # Save or delete options
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        save_button = st.form_submit_button("Save Changes")
+                    with col2:
+                        delete_button = st.form_submit_button("Delete Promotion")
+
+                    # Save changes
+                    if save_button:
+                        promo_df.loc[index, "name"] = promo_name
+                        promo_df.loc[index, "description"] = promo_desc
+                        promo_df.loc[index, "start_date"] = str(start_date)
+                        promo_df.loc[index, "end_date"] = str(end_date)
+                        promo_df.loc[index, "discount"] = discount
+                        save_promotions_data(promo_df)
+                        st.cache_data.clear()  # Clear cached data
+                        st.success(f"Promotion '{promo_name}' updated successfully!")
+                        st.rerun()
+
+                    # Delete promotion
+                    if delete_button:
+                        promo_df = promo_df.drop(index)
+                        save_promotions_data(promo_df)
+                        st.cache_data.clear()  # Clear cached data
+                        st.success(f"Promotion '{row['name']}' deleted successfully!")
+                        st.rerun()
+
+    # Add new promotion form
+    st.subheader("Add New Promotion")
+    with st.form("add_promotion"):
         promo_name = st.text_input("Promotion Name")
         promo_desc = st.text_area("Promotion Description")
         start_date = st.date_input("Start Date")
@@ -36,39 +79,20 @@ def manage_promotions():
         submitted = st.form_submit_button("Create Promotion")
         
         if submitted:
-            # Load existing promotions data
-            promo_df = load_promotions_data()
-            
-            # Append the new promotion
-            new_promo = pd.DataFrame (
+            # Append new promotion to the DataFrame
+            new_promo = pd.DataFrame(
                 [
                     {
-                'name': promo_name,
-                'description': promo_desc,
-                'start_date': str(start_date),  # Convert to string for Google Sheets
-                'end_date': str(end_date),      # Convert to string for Google Sheets
-                'discount': discount
+                        "name": promo_name,
+                        "description": promo_desc,
+                        "start_date": str(start_date),
+                        "end_date": str(end_date),
+                        "discount": discount
                     }
                 ]
             )
-    
-
-            new_promo_df = promo_df._append(new_promo, ignore_index=True)
-            
-            # Save to Google Sheets
-            #save_promotions_data(promo_df)
-            #st.success("Promotion created successfully!")
-
-            try:
-                #Update Gsheet by appending new row
-                new_promo_df = pd.concat([promo_df, new_promo,], ignore_index=True)
-                conn.update(worksheet="Promotion", data=new_promo_df)
-                st.success("Promotion created successfully!")
-            
-            except Exception as e:
-                st.error(f"Failed to update promotions: {e}")
-
-    
-        # Display existing promotions
-        promo_df = load_promotions_data()
-        st.dataframe(promo_df)
+            promo_df = pd.concat([promo_df, new_promo], ignore_index=True)
+            save_promotions_data(promo_df)
+            st.cache_data.clear()  # Clear cached data
+            st.success(f"Promotion '{promo_name}' created successfully!")
+            st.rerun()
