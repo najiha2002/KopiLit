@@ -270,6 +270,7 @@ st.markdown(
         padding: 10px;
         text-align: center;
     }
+    
     .footer-column img {
         width: 100%;
         max-width: 100px;
