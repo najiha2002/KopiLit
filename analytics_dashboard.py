@@ -7,8 +7,8 @@ import plotly.express as px
 conn = st.connection("gsheets", type=GSheetsConnection)
 
 def analytics():
-    st.title("Analytics Dashboard")
-    st.write("Real-time stats on current orders, inventory levels, and sales.")
+    st.title("📊 Analytics Dashboard")
+    st.write("Real-time insights into current orders, inventory levels, and sales performance.")
 
     # Load data from Google Sheets
     try:
@@ -19,88 +19,143 @@ def analytics():
         st.error(f"Error loading data: {e}")
         return
 
-    # Bar Chart: Total Sales by Coffee Type
-    if 'Status' in sales_data.columns and 'Coffee Type' in sales_data.columns and 'Price' in sales_data.columns:
-        # Filter for completed orders
+    # Filter: Date Range for Sales Data
+    st.markdown("### 🗓️ Filter Sales by Date Range")
+    if 'Timestamp' in sales_data.columns:
+        sales_data['Timestamp'] = pd.to_datetime(sales_data['Timestamp'], errors='coerce')
+        min_date = sales_data['Timestamp'].min().date()
+        max_date = sales_data['Timestamp'].max().date()
+        start_date, end_date = st.date_input(
+            "Select Date Range:",
+            value=(min_date, max_date),
+            min_value=min_date,
+            max_value=max_date
+        )
+        sales_data = sales_data[(sales_data['Timestamp'].dt.date >= start_date) & (sales_data['Timestamp'].dt.date <= end_date)]
+    else:
+        st.warning("Timestamp column missing in sales data.")
+
+    st.markdown("---")
+
+    # Total Revenue and Key Metrics
+    st.markdown("### 📈 Key Performance Metrics")
+    if 'Price' in sales_data.columns:
         completed_sales = sales_data[sales_data['Status'].str.lower() == 'completed']
-
-        # Convert Price column to numeric
         completed_sales['Price'] = pd.to_numeric(completed_sales['Price'], errors='coerce')
+        total_revenue = completed_sales['Price'].sum()
+        total_orders = len(completed_sales)
+        avg_order_value = total_revenue / total_orders if total_orders > 0 else 0
 
-        # Aggregate sales by Coffee Type
-        coffee_price_sum = completed_sales.groupby('Coffee Type')['Price'].sum().reset_index()
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Total Revenue", f"${total_revenue:.2f}")
+        col2.metric("Total Completed Orders", total_orders)
+        col3.metric("Average Order Value", f"${avg_order_value:.2f}")
 
-        # Plot the data
-        if not coffee_price_sum.empty:
-            fig1 = px.bar(
-                coffee_price_sum,
-                x='Coffee Type',
+    st.markdown("---")
+
+    # Sales Trend Over Time
+    st.markdown("### 📅 Sales Trend Over Time")
+    if 'Timestamp' in sales_data.columns and 'Price' in sales_data.columns:
+        sales_data['Price'] = pd.to_numeric(sales_data['Price'], errors='coerce')
+        sales_data['Date'] = sales_data['Timestamp'].dt.date
+        daily_sales = sales_data.groupby('Date')['Price'].sum().reset_index()
+
+        if not daily_sales.empty:
+            fig5 = px.line(
+                daily_sales,
+                x='Date',
                 y='Price',
-                title='Total Sales by Coffee Type',
-                labels={'Price': 'Total Price', 'Coffee Type': 'Type of Coffee'}
+                title='Sales Trend Over Time',
+                labels={'Date': 'Date', 'Price': 'Total Revenue'},
+                markers=True
             )
-            with st.expander("Total Sales by Coffee Type", expanded=True):
-                st.plotly_chart(fig1, use_container_width=True)
+            st.plotly_chart(fig5, use_container_width=True)
         else:
-            st.info("No sales data available for completed orders.")
+            st.info("No sales data available for the selected date range.")
 
-    # Bar Chart: Available Inventory Stock Quantity
+    st.markdown("---")
+
+    # Low Stock Items
+    st.markdown("### 🔍 Low Stock Alerts")
     if 'Item' in inventory_data.columns and 'Quantity' in inventory_data.columns:
-        # Convert Quantity column to numeric
         inventory_data['Quantity'] = pd.to_numeric(inventory_data['Quantity'], errors='coerce')
+        low_stock_items = inventory_data[inventory_data['Quantity'] <= 5]
 
-        # Plot the data
-        if not inventory_data.empty:
-            fig2 = px.bar(
-                inventory_data,
-                x='Item',
-                y='Quantity',
-                title='Stock Inventory Quantity',
-                labels={'Quantity': 'Quantity', 'Item': 'Item'}
-            )
-            with st.expander("Stock Inventory Quantity", expanded=True):
-                st.plotly_chart(fig2, use_container_width=True)
+        if not low_stock_items.empty:
+            st.warning("⚠️ The following items are running low on stock:")
+            st.dataframe(low_stock_items)
         else:
-            st.info("No inventory data available.")
+            st.success("All inventory items are sufficiently stocked.")
+    else:
+        st.warning("Inventory data is incomplete.")
 
-    # Bar Chart: User Preference on Coffee Type (Completed Orders)
-    if 'coffee_type' in sales_data.columns and 'quantity' in sales_data.columns and 'status' in sales_data.columns:
-        # Filter for completed orders
-        completed_orders = sales_data[sales_data['status'].str.lower() == 'completed']
+    st.markdown("---")
 
-        # Convert quantity column to numeric
-        completed_orders['quantity'] = pd.to_numeric(completed_orders['quantity'], errors='coerce')
 
-        # Aggregate coffee preferences
-        coffee_preference = completed_orders.groupby('coffee_type')['quantity'].sum().reset_index()
+    # Heatmap: Popular Coffee Types by Time of Day
+    st.markdown("### 🕒 Coffee Popularity by Time of Day")
+    if 'Coffee Type' in sales_data.columns and 'Timestamp' in sales_data.columns:
+        try:
+            # Extract hour from the Timestamp
+            sales_data['Timestamp'] = pd.to_datetime(sales_data['Timestamp'], errors='coerce')
+            sales_data['Hour'] = sales_data['Timestamp'].dt.hour
 
-        # Plot the data
-        if not coffee_preference.empty:
-            fig3 = px.bar(
-                coffee_preference,
-                x='coffee_type',
-                y='quantity',
-                title='User Preference on Coffee Type (Completed Orders)',
-                labels={'quantity': 'Quantity', 'coffee_type': 'Coffee Type'}
-            )
-            with st.expander("User Preference on Coffee Type (Completed Orders)", expanded=True):
-                st.plotly_chart(fig3, use_container_width=True)
-        else:
-            st.info("No completed orders available to analyze user preferences.")
+            # Group by Coffee Type and Hour
+            coffee_time_data = sales_data.groupby(['Coffee Type', 'Hour']).size().reset_index(name='Orders')
 
-    # Distribution of Customer Gender
+            # Ensure Hour is sorted and numeric
+            coffee_time_data['Hour'] = coffee_time_data['Hour'].astype(int)
+
+            # Plot the heatmap
+            if not coffee_time_data.empty:
+                fig6 = px.density_heatmap(
+                    coffee_time_data,
+                    x='Hour',
+                    y='Coffee Type',
+                    z='Orders',
+                    title='Coffee Popularity by Time of Day',
+                    labels={'Hour': 'Hour of Day', 'Coffee Type': 'Type of Coffee', 'Orders': 'Number of Orders'},
+                    color_continuous_scale="Blues",
+                )
+                fig6.update_xaxes(type='category')  # Ensure Hour is treated as discrete
+                st.plotly_chart(fig6, use_container_width=True)
+            else:
+                st.info("No data available to analyze coffee popularity by time of day.")
+        except Exception as e:
+            st.error(f"Error processing data for coffee popularity heatmap: {e}")
+
+
+    st.markdown("---")
+
+    # Customer Demographics: Gender and Loyalty Points
+    st.markdown("### 🧑‍🤝‍🧑 Customer Demographics")
     if 'Gender' in user_data.columns:
         gender_distribution = user_data['Gender'].value_counts().reset_index()
         gender_distribution.columns = ['Gender', 'Count']
 
         if not gender_distribution.empty:
-            fig4 = px.pie(
+            fig7 = px.pie(
                 gender_distribution,
                 names='Gender',
                 values='Count',
                 title='Customer Gender Distribution'
             )
-            with st.expander("Customer Gender Distribution"):
-                st.plotly_chart(fig4, use_container_width=True)
+            st.plotly_chart(fig7, use_container_width=True)
         else:
-            st.info("No user data available for gender distribution.")
+            st.info("No gender data available.")
+
+    if 'Loyalty Points' in user_data.columns:
+        user_data['Loyalty Points'] = pd.to_numeric(user_data['Loyalty Points'], errors='coerce').fillna(0)
+        loyalty_distribution = user_data.groupby('Gender')['Loyalty Points'].mean().reset_index()
+
+        if not loyalty_distribution.empty:
+            fig8 = px.bar(
+                loyalty_distribution,
+                x='Gender',
+                y='Loyalty Points',
+                title='Average Loyalty Points by Gender',
+                labels={'Loyalty Points': 'Average Points', 'Gender': 'Gender'}
+            )
+            st.plotly_chart(fig8, use_container_width=True)
+        else:
+            st.info("No loyalty points data available.")

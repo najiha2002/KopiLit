@@ -131,11 +131,11 @@ def flow(username):
     user_data = user_df[user_df['Username'] == username]
     first_name = user_data['First Name'].iloc[0]
 
-    check_notifications(username)
-
     image_url = "https://i.ibb.co/rbPn1vt/kopilit.png"  
     # Add the image to the sidebar
     st.sidebar.image(image_url, use_column_width=True)
+
+    check_notifications(username)
     
     # Sidebar navigation options
     st.sidebar.title(f"Hi, {first_name}!")

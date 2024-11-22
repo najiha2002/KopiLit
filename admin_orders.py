@@ -15,8 +15,7 @@ def view_orders():
         orders_data = conn.read(worksheet="Order")  # Replace with your actual worksheet name
         orders_df = pd.DataFrame(orders_data)
         orders_df['Booking Number'] = orders_df['Booking Number'].astype(int)
-        orders_df["Timestamp"] = pd.to_datetime(orders_df["Timestamp"])  # Ensure Timestamp is datetime
-        orders_df = orders_df.sort_values(by="Timestamp", ascending=False)
+        
 
         # Check if there are any orders
         if not orders_df.empty:
@@ -88,6 +87,7 @@ def view_orders():
 
                         # Clear cache to ensure fresh data on reload
                         st.cache_data.clear()
+                        st.rerun()
 
                     except Exception as e:
                         st.error(f"An error occurred while updating Google Sheets: {e}")
@@ -99,7 +99,7 @@ def view_orders():
             st.markdown("### ✅ Completed Orders")
             completed_orders = orders_df[orders_df["Status"] == "Completed"]
             if not completed_orders.empty:
-                st.dataframe(completed_orders)
+                st.dataframe(completed_orders.sort_values(by='Timestamp', ascending=False))
             else:
                 st.info("No completed orders found.")
 
