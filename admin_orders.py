@@ -98,8 +98,9 @@ def view_orders():
             st.markdown("---")
             st.markdown("### ✅ Completed Orders")
             completed_orders = orders_df[orders_df["Status"] == "Completed"]
+            completed_orders ['Formatted Timestamp'] = pd.to_datetime(orders_df["Timestamp"], format='mixed')
             if not completed_orders.empty:
-                st.dataframe(completed_orders.sort_values(by='Timestamp', ascending=False))
+                st.dataframe(completed_orders.sort_values(by='Formatted Timestamp', ascending=False))
             else:
                 st.info("No completed orders found.")
 
