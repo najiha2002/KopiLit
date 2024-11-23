@@ -6,14 +6,14 @@ import rewards
 from streamlit_gsheets import GSheetsConnection
 import datetime
 
+
 # Establish Google Sheets connection
 conn = st.connection("gsheets", type=GSheetsConnection)
+
 
 def fetch_menu():
     menu_data = pd.DataFrame(conn.read(worksheet = "Menu"))
     
-
-
 
 # Styling
     st.markdown(
@@ -133,6 +133,7 @@ def fetch_menu():
         unsafe_allow_html=True,
     )
 
+
     # Styling
     st.markdown(
         """
@@ -186,8 +187,6 @@ def fetch_menu():
         unsafe_allow_html=True,
     )
     return menu_data
-
-
 
 
 def display_menu():
@@ -333,6 +332,7 @@ def display_menu():
         unsafe_allow_html=True,
     )
 
+
 def display_feedback():
     feedback_data = [
         {
@@ -374,7 +374,8 @@ def display_feedback():
             if st.button("➡", key="next") and current_index < len(feedback_data) - 1:
                 st.session_state["feedback_index"] += 1
 
-    # Footer Content
+
+# Footer Content
 def display_footer():
     st.markdown(
         """
@@ -413,9 +414,6 @@ def display_footer():
     )
 
 
-
-
-
 def check_notifications(username):
     try:
         # Load notifications from the Google Sheets
@@ -443,6 +441,7 @@ def check_notifications(username):
             st.sidebar.info("No notifications for today.")
     except Exception as e:
         st.sidebar.error(f"Error fetching notifications: {e}")
+
 
 def flow(username):
     # Load user data from Google Sheets
@@ -482,9 +481,4 @@ def flow(username):
     elif navigation == "Account":
         st.header("Your Account")
         feedback.collect_feedback()
-
-
-
-
-
 
