@@ -215,7 +215,7 @@ def display_menu():
                 
                 # Order button with a unique key
                 if st.button(f"Order {row['Name']}", key=f"order-{row['Menu ID']}-{index}"):
-                    st.query_params(page="menu")  # Navigate to the menu page
+                    st.query_params(page="Menu")  # Navigate to the menu page
 
 
 # styling
@@ -333,16 +333,13 @@ def display_menu():
     )
 
 
+def fetch_feedback():
+    feedback_data = pd.DataFrame(conn.read(worksheet="Feedback"))  # Replace "Feedback" with your sheet name
+    return feedback_data
+
+
 def display_feedback():
-    feedback_data = [
-        {
-            "user_image": "https://media.licdn.com/dms/image/v2/D5603AQHZAvqJ3wWNLA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1684360186268?e=1737590400&v=beta&t=V9JNmbDQXU791uLgGp2P7SzuDL4J42yNyTxmP1ruE_k",
-            "feedback": "I have tested KopiLit Coffee many times. Really amazing to me. The combination was very good. One thing is to serve extraordinary coffee with KopiLit. I will order from KopiLit for any of my coffee needs.",
-            "name": "Adarisa",
-            "stars": 5,
-        },
-        # Add more feedback entries if needed
-    ]
+    feedback_data = fetch_feedback()  # Fetch dynamic feedback data
 
     if "feedback_index" not in st.session_state:
         st.session_state["feedback_index"] = 0
@@ -350,30 +347,34 @@ def display_feedback():
     current_index = st.session_state["feedback_index"]
 
     with st.expander("What Our Customers Say", expanded=True):
-        # Display feedback
-        st.markdown(
-            f"""
-            <div class="feedback-container">
-                <img src="{feedback_data[current_index]['user_image']}" alt="User Image" width="100">
-                <p>{feedback_data[current_index]['feedback']}</p>
-                <div class="feedback-stars">{'★' * feedback_data[current_index]['stars']}</div>
-                <div class="feedback-name">{feedback_data[current_index]['name']}</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+        if not feedback_data.empty:
+            # Display feedback dynamically
+            current_feedback = feedback_data.iloc[current_index]
+            stars = "★" * int(current_feedback["Rating"])
 
-        # Navigation buttons
-        col1, col2, col3 = st.columns([1, 6, 1])
+            st.markdown(
+                f"""
+                <div class="feedback-container">
+                    <p>{current_feedback["Feedback"]}</p>
+                    <div class="feedback-stars">{stars}</div>
+                    <div class="feedback-name">{current_feedback["Name"]}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
-        with col1:
-            if st.button("⬅", key="prev") and current_index > 0:
-                st.session_state["feedback_index"] -= 1
+            # Navigation buttons
+            col1, col2, col3 = st.columns([1, 6, 1])
 
-        with col3:
-            if st.button("➡", key="next") and current_index < len(feedback_data) - 1:
-                st.session_state["feedback_index"] += 1
+            with col1:
+                if st.button("⬅", key="prev") and current_index > 0:
+                    st.session_state["feedback_index"] -= 1
 
+            with col3:
+                if st.button("➡", key="next") and current_index < len(feedback_data) - 1:
+                    st.session_state["feedback_index"] += 1
+        else:
+            st.warning("No feedback available.")
 
 # Footer Content
 def display_footer():
