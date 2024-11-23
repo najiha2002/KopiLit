@@ -8,11 +8,11 @@ import datetime
 conn = st.connection("gsheets", type=GSheetsConnection)
 spreadsheet = "1zu1v-w6KnpB-Mw6D5_ikwL2jrkmzGT_MF6Dpu-J0Y_I"
 
-# Initialize session state for the cart if it doesn't exist
-if 'cart' not in st.session_state:
-    st.session_state.cart = []
-
 def customer_order(username):
+    # Initialize session state for the cart if it doesn't exist
+    if 'cart' not in st.session_state:
+        st.session_state.cart = []
+        
     st.title("☕ Customer Order")
 
     # Coffee menu with emojis
