@@ -100,8 +100,7 @@ def fetch_menu():
                 crafted to awaken your senses and start your day right.
             </p>
             <div class="btn-container">
-                <a href="#" class="btn">Order Now</a>
-                <a href="#" class="btn">Explore More</a>
+                <a href="https://homecoffeeexpert.com/history-of-coffee/" target="_blank" class="btn">Explore More</a>
             </div>
             <div class="stats-container">
                 <div class="stats-item">
