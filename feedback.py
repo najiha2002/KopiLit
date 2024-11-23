@@ -65,7 +65,7 @@ def collect_feedback():
                 "Timestamp": pd.Timestamp.now()
             }])
             save_feedback_data(new_feedback)
-            st.experimental_rerun()
+            st.rerun()
         else:
             st.error("Feedback text cannot be empty.")
 
