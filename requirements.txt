@@ -1,6 +1,6 @@
 streamlit
 pandas
-st-gsheets-connection
+st-gsheets-connection==0.0.7
 datetime
 plotly.express
 random
