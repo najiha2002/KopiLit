@@ -46,7 +46,7 @@ def manage_inventory():
         
         # Update the Google Sheets Inventory worksheet with the updated DataFrame
         try:
-            conn.update(spreadsheet_id = spreadsheet, worksheet="Inventory", data=updated_inventory_df)  # Update the inventory worksheet
+            conn.update(worksheet="Inventory", data=updated_inventory_df)  # Update the inventory worksheet
             # Clear the cached data to fetch the updated inventory on reload
             st.cache_data.clear()
             st.success("Inventory updated successfully!")

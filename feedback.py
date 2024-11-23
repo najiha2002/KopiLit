@@ -23,7 +23,7 @@ def save_feedback_data(new_feedback):
         st.cache_data.clear()
         feedback_df = load_feedback_data()
         updated_feedback_df = pd.concat([feedback_df, new_feedback], ignore_index=True)
-        conn.update(spreadsheet_id = spreadsheet, worksheet="Feedback", data=updated_feedback_df)
+        conn.update(worksheet="Feedback", data=updated_feedback_df)
         st.success("Thank you for your feedback!")
         # Clear cache after updating data
         st.cache_data.clear()

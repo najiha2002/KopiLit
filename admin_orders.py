@@ -66,7 +66,7 @@ def view_orders():
 
                     # Update the Google Sheet with the modified DataFrame
                     try:
-                        conn.update(spreadsheet_id = spreadsheet, worksheet="Order", data=orders_df)
+                        conn.update(worksheet="Order", data=orders_df)
 
                         # Create a new notification for the customer
                         customer_username = order_details["Username"].iloc[0]
@@ -82,7 +82,7 @@ def view_orders():
                         new_notifications_df = pd.concat(
                             [notifications_df, pd.DataFrame([notification])], ignore_index=True
                         )
-                        conn.update(spreadsheet_id = spreadsheet, worksheet="Notifications", data=new_notifications_df)
+                        conn.update(worksheet="Notifications", data=new_notifications_df)
 
                         st.success("Order status updated and customer notified!")
 

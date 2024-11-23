@@ -15,7 +15,7 @@ def load_promotions_data():
 def save_promotions_data(dataframe):
     """Save the entire promotions DataFrame to Google Sheets."""
     try:
-        conn.update(spreadsheet_id = spreadsheet, worksheet="Promotion", data=dataframe)
+        conn.update(worksheet="Promotion", data=dataframe)
     except Exception as e:
         st.error(f"Failed to update promotions: {e}")
 
