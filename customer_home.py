@@ -11,177 +11,181 @@ conn = st.connection("gsheets", type=GSheetsConnection)
 
 def fetch_menu():
     menu_data = pd.DataFrame(conn.read(worksheet = "Menu"))
+    
+
+
+
+# Styling
+    st.markdown(
+        """
+        <style>
+        body {
+            background-color: #1b1b1b; /* Dark background */
+        }
+        .header-section {
+            text-align: center;
+            color: white;
+            padding: 50px 20px;
+            font-family: 'Georgia', serif;
+        }
+        .header-title {
+            font-size: 3.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .header-subtitle {
+            font-size: 1.5em;
+            margin-bottom: 40px;
+        }
+        .btn-container {
+            margin-top: 20px;
+        }
+        .btn {
+            display: inline-block;
+            text-decoration: none;
+            padding: 10px 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #1b1b1b;
+            background-color: white;
+            border: 2px solid white;
+            border-radius: 5px;
+            margin: 5px;
+            transition: all 0.3s ease-in-out;
+        }
+        .btn:hover {
+            background-color: #ffc107; /* Coffee color */
+            color: #1b1b1b;
+        }
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+            gap: 50px;
+        }
+        .stats-item {
+            text-align: center;
+            color: white;
+            font-family: 'Arial', sans-serif;
+        }
+        .stats-item h2 {
+            font-size: 2.5em;
+            margin: 0;
+        }
+        .stats-item p {
+            font-size: 1em;
+            margin: 0;
+        }
+        .coffee-image {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .coffee-image img {
+            max-width: 400px;
+            border-radius: 10px;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+    # Header Section
+    st.markdown(
+        """
+        <div class="header-section">
+            <h1 class="header-title">Discover The Art Of Perfect Coffee</h1>
+            <p class="header-subtitle">
+                Experience the rich and bold flavors of KopiLit's exquisite coffee blends, 
+                crafted to awaken your senses and start your day right.
+            </p>
+            <div class="btn-container">
+                <a href="#" class="btn">Order Now</a>
+                <a href="#" class="btn">Explore More</a>
+            </div>
+            <div class="stats-container">
+                <div class="stats-item">
+                    <h2>50+</h2>
+                    <p>Items of Coffee</p>
+                </div>
+                <div class="stats-item">
+                    <h2>20+</h2>
+                    <p>Orders Running</p>
+                </div>
+                <div class="stats-item">
+                    <h2>2k+</h2>
+                    <p>Happy Customers</p>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+    # Coffee Image Section
+    st.markdown(
+        """
+        <div class="coffee-image">
+            <img src="https://thumbs.dreamstime.com/b/dynamic-coffee-splash-mug-dark-background-high-speed-capture-droplets-frozen-time-around-white-325109112.jpg" alt="Coffee Splash">
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # Styling
+    st.markdown(
+        """
+        <style>
+        .product-card {
+            text-align: center;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .product-card img {
+            border-radius: 10px;
+            max-width: 100%;
+            height: auto;
+        }
+        .product-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #6D4C41;
+            margin: 10px 0 5px;
+        }
+        .product-description {
+            font-size: 14px;
+            color: #795548;
+            margin: 5px 0 15px;
+        }
+        .product-price {
+            font-size: 16px;
+            color: #3E2723;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .add-to-cart-btn {
+            display: inline-block;
+            background-color: #6D4C41;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .add-to-cart-btn:hover {
+            background-color: #3E2723;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
     return menu_data
-
-
-# Styling
-st.markdown(
-    """
-    <style>
-    body {
-        background-color: #1b1b1b; /* Dark background */
-    }
-    .header-section {
-        text-align: center;
-        color: white;
-        padding: 50px 20px;
-        font-family: 'Georgia', serif;
-    }
-    .header-title {
-        font-size: 3.5em;
-        font-weight: bold;
-        margin-bottom: 20px;
-    }
-    .header-subtitle {
-        font-size: 1.5em;
-        margin-bottom: 40px;
-    }
-    .btn-container {
-        margin-top: 20px;
-    }
-    .btn {
-        display: inline-block;
-        text-decoration: none;
-        padding: 10px 25px;
-        font-size: 1.1em;
-        font-weight: bold;
-        color: #1b1b1b;
-        background-color: white;
-        border: 2px solid white;
-        border-radius: 5px;
-        margin: 5px;
-        transition: all 0.3s ease-in-out;
-    }
-    .btn:hover {
-        background-color: #ffc107; /* Coffee color */
-        color: #1b1b1b;
-    }
-    .stats-container {
-        display: flex;
-        justify-content: center;
-        margin-top: 40px;
-        gap: 50px;
-    }
-    .stats-item {
-        text-align: center;
-        color: white;
-        font-family: 'Arial', sans-serif;
-    }
-    .stats-item h2 {
-        font-size: 2.5em;
-        margin: 0;
-    }
-    .stats-item p {
-        font-size: 1em;
-        margin: 0;
-    }
-    .coffee-image {
-        text-align: center;
-        margin-top: 30px;
-    }
-    .coffee-image img {
-        max-width: 400px;
-        border-radius: 10px;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-# Header Section
-st.markdown(
-    """
-    <div class="header-section">
-        <h1 class="header-title">Discover The Art Of Perfect Coffee</h1>
-        <p class="header-subtitle">
-            Experience the rich and bold flavors of KopiLit's exquisite coffee blends, 
-            crafted to awaken your senses and start your day right.
-        </p>
-        <div class="btn-container">
-            <a href="#" class="btn">Order Now</a>
-            <a href="#" class="btn">Explore More</a>
-        </div>
-        <div class="stats-container">
-            <div class="stats-item">
-                <h2>50+</h2>
-                <p>Items of Coffee</p>
-            </div>
-            <div class="stats-item">
-                <h2>20+</h2>
-                <p>Orders Running</p>
-            </div>
-            <div class="stats-item">
-                <h2>2k+</h2>
-                <p>Happy Customers</p>
-            </div>
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-# Coffee Image Section
-st.markdown(
-    """
-    <div class="coffee-image">
-        <img src="https://thumbs.dreamstime.com/b/dynamic-coffee-splash-mug-dark-background-high-speed-capture-droplets-frozen-time-around-white-325109112.jpg" alt="Coffee Splash">
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-# Styling
-st.markdown(
-    """
-    <style>
-    .product-card {
-        text-align: center;
-        background-color: #fff;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        padding: 20px;
-        margin: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .product-card img {
-        border-radius: 10px;
-        max-width: 100%;
-        height: auto;
-    }
-    .product-title {
-        font-size: 18px;
-        font-weight: bold;
-        color: #6D4C41;
-        margin: 10px 0 5px;
-    }
-    .product-description {
-        font-size: 14px;
-        color: #795548;
-        margin: 5px 0 15px;
-    }
-    .product-price {
-        font-size: 16px;
-        color: #3E2723;
-        font-weight: bold;
-        margin-bottom: 10px;
-    }
-    .add-to-cart-btn {
-        display: inline-block;
-        background-color: #6D4C41;
-        color: #fff;
-        text-decoration: none;
-        font-size: 14px;
-        padding: 10px 20px;
-        border-radius: 5px;
-        margin-top: 10px;
-    }
-    .add-to-cart-btn:hover {
-        background-color: #3E2723;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
 
 
 
@@ -216,118 +220,118 @@ def display_menu():
 
 
 # styling
-st.markdown(
-    """
-    <style>
-    .feedback-container {
-        text-align: center;
-        background-color: #3e2723;
-        color: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        margin: 20px auto;
-        max-width: 600px;
-    }
-    .feedback-container img {
-        border-radius: 50%;
-        margin-bottom: 20px;
-    }
-    .feedback-stars {
-        color: #ffc107;
-        font-size: 1.5em;
-        margin: 10px 0;
-    }
-    .feedback-name {
-        font-weight: bold;
-        font-size: 1.2em;
-        margin-top: 10px;
-    }
-    .arrow-button {
-        background-color: transparent;
-        border: none;
-        color: #3e2723;
-        font-size: 1.5em;
-        cursor: pointer;
-        padding: 10px;
-    }
-    .arrow-button:hover {
-        color: #ffc107;
-    }
-        .footer-container {
-        background-color: #3e2723;
-        color: white;
-        padding: 20px;
-        font-family: 'Arial', sans-serif;
-    }
-    .footer-columns {
-        display: flex;
-        justify-content: space-between;
-        margin: 20px 0;
-    }
-    .footer-column {
-        flex: 1;
-        padding: 10px;
-        text-align: center;
-    }
-    
-    .footer-column img {
-        width: 100%;
-        max-width: 100px;
-        border-radius: 10px;
-    }
-    .footer-column h3 {
-        font-size: 1.2em;
-        font-weight: bold;
-    }
-    .footer-column p {
-        margin: 5px 0;
-        line-height: 1.5;
-    }
-    .subscribe-input {
-        padding: 10px;
-        width: 80%;
-        border: none;
-        border-radius: 5px;
-        margin-right: 10px;
-        outline: none;
-    }
-    .subscribe-button {
-        padding: 10px 15px;
-        background-color: #ffc107;
-        border: none;
-        border-radius: 5px;
-        color: #3e2723;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    .subscribe-button:hover {
-        background-color: #e6a700;
-    }
-    .footer-social-icons {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin-top: 10px;
-    }
-    .footer-social-icons a {
-        color: white;
-        font-size: 1.5em;
-        text-decoration: none;
-    }
-    .footer-social-icons a:hover {
-        color: #ffc107;
-    }
-    .footer-copyright {
-        text-align: center;
-        margin-top: 20px;
-        font-size: 0.9em;
-        color: #ccc;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+    st.markdown(
+        """
+        <style>
+        .feedback-container {
+            text-align: center;
+            background-color: #3e2723;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            margin: 20px auto;
+            max-width: 600px;
+        }
+        .feedback-container img {
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+        .feedback-stars {
+            color: #ffc107;
+            font-size: 1.5em;
+            margin: 10px 0;
+        }
+        .feedback-name {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+        .arrow-button {
+            background-color: transparent;
+            border: none;
+            color: #3e2723;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 10px;
+        }
+        .arrow-button:hover {
+            color: #ffc107;
+        }
+            .footer-container {
+            background-color: #3e2723;
+            color: white;
+            padding: 20px;
+            font-family: 'Arial', sans-serif;
+        }
+        .footer-columns {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        .footer-column {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .footer-column img {
+            width: 100%;
+            max-width: 100px;
+            border-radius: 10px;
+        }
+        .footer-column h3 {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .footer-column p {
+            margin: 5px 0;
+            line-height: 1.5;
+        }
+        .subscribe-input {
+            padding: 10px;
+            width: 80%;
+            border: none;
+            border-radius: 5px;
+            margin-right: 10px;
+            outline: none;
+        }
+        .subscribe-button {
+            padding: 10px 15px;
+            background-color: #ffc107;
+            border: none;
+            border-radius: 5px;
+            color: #3e2723;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .subscribe-button:hover {
+            background-color: #e6a700;
+        }
+        .footer-social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .footer-social-icons a {
+            color: white;
+            font-size: 1.5em;
+            text-decoration: none;
+        }
+        .footer-social-icons a:hover {
+            color: #ffc107;
+        }
+        .footer-copyright {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #ccc;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
 def display_feedback():
     feedback_data = [
@@ -412,8 +416,6 @@ def display_footer():
 
 
 
-
-
 def check_notifications(username):
     try:
         # Load notifications from the Google Sheets
@@ -480,6 +482,9 @@ def flow(username):
     elif navigation == "Account":
         st.header("Your Account")
         feedback.collect_feedback()
+
+
+
 
 
 
