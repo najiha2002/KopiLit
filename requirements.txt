@@ -1,0 +1,6 @@
+streamlit
+pandas
+streamlit_gsheets
+datetime
+plotly.express
+random
