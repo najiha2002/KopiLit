@@ -115,8 +115,53 @@ def customer_order(username):
         loyalty_points = int(final_price)  # 1 point per $1 spent
         st.markdown(f"##### 🌟 **Loyalty Points Earned: {loyalty_points} points**")
 
+        # Payment Section inside an Expander
+        st.markdown("---")
+        with st.expander("💳 Proceed to Payment"):
+            st.markdown("### Select Payment Method")
+
+            # Initialize session state for payment method
+            if "selected_payment_option" not in st.session_state:
+                st.session_state.selected_payment_option = None
+
+            # Payment Method Selection
+            payment_option = st.radio(
+                "Choose your payment method:",
+                ["Credit/Debit Card", "PayPal", "Cash on Delivery"],
+                key="payment_method_radio"
+            )
+
+            # Save the selected payment option in session state
+            if payment_option:
+                st.session_state.selected_payment_option = payment_option
+
+            # Show corresponding payment form
+            if st.session_state.selected_payment_option == "Credit/Debit Card":
+                st.markdown("#### 💳 Enter Card Details")
+                card_number = st.text_input("Card Number", key="card_number")
+                card_holder = st.text_input("Card Holder Name", key="card_holder")
+                expiry_date = st.text_input("Expiry Date (MM/YY)", key="expiry_date")
+                cvv = st.text_input("CVV", type="password", key="cvv")
+
+                if st.button("Verify", key="verify_card"):
+                        if card_number and card_holder and expiry_date and cvv:
+                            st.success(f"Card is valid.")
+                            payment = "Card"
+
+            elif st.session_state.selected_payment_option == "PayPal":
+                st.markdown("#### 🅿️ Enter PayPal Email")
+                paypal_email = st.text_input("PayPal Email", key="paypal_email")
+                if st.button("Verify", key="verify_paypal"):
+                        if paypal_email:
+                            st.success(f"Paypal is valid.")
+                            payment = "PayPal"
+
+            elif st.session_state.selected_payment_option == "Cash on Delivery":
+                payment = "COD"
+
         # Place Order button
         if st.button("Place Order ✅"):
+
             orders_data = conn.read(worksheet="Order")
             orders_df = pd.DataFrame(orders_data)
 
@@ -141,7 +186,8 @@ def customer_order(username):
                     "Price": total_price,
                     "Final Price": final_price,
                     "Promo Code": promo_code,
-                    "Loyalty Points": loyalty_points 
+                    "Loyalty Points": loyalty_points,
+                    "Payment": st.session_state.selected_payment_option
                 })
 
             new_order_df = pd.DataFrame(new_orders)

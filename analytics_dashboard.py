@@ -77,9 +77,9 @@ def analytics():
 
     # Low Stock Items
     st.markdown("### 🔍 Low Stock Alerts")
-    if 'Item' in inventory_data.columns and 'Quantity' in inventory_data.columns:
-        inventory_data['Quantity'] = pd.to_numeric(inventory_data['Quantity'], errors='coerce')
-        low_stock_items = inventory_data[inventory_data['Quantity'] <= 5]
+    if 'Item' in inventory_data.columns and 'Stock' in inventory_data.columns:
+        inventory_data['Stock'] = pd.to_numeric(inventory_data['Stock'], errors='coerce')
+        low_stock_items = inventory_data[inventory_data['Stock'] <= 5]
 
         if not low_stock_items.empty:
             st.warning("⚠️ The following items are running low on stock:")
@@ -159,3 +159,42 @@ def analytics():
             st.plotly_chart(fig8, use_container_width=True)
         else:
             st.info("No loyalty points data available.")
+
+    st.markdown("---")
+
+    st.markdown("### 📊 Payment Method Usage")
+
+    try:
+        # Fetch data from the Order sheet
+        orders_data = conn.read(worksheet="Order")
+        orders_df = pd.DataFrame(orders_data)
+
+        # Ensure the DataFrame is not empty
+        if orders_df.empty:
+            st.info("No orders available to display payment statistics.")
+            return
+
+        # Aggregate payment method counts
+        payment_counts = orders_df["Payment"].value_counts().reset_index()
+        payment_counts.columns = ["Payment Method", "Count"]
+
+        # Create a bar chart using Plotly
+        fig = px.bar(
+            payment_counts,
+            x="Payment Method",
+            y="Count",
+            color="Payment Method",
+            title="Usage of Payment Methods",
+            labels={"Payment Method": "Payment Method", "Count": "Number of Orders"},
+            text="Count",
+        )
+
+        # Customize the chart
+        fig.update_traces(textposition="outside")
+        fig.update_layout(showlegend=False)
+
+        # Display the chart
+        st.plotly_chart(fig, use_container_width=True)
+
+    except Exception as e:
+        st.error(f"Error fetching payment data: {e}")
