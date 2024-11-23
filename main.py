@@ -16,7 +16,7 @@ conn = st.connection("gsheets", type=GSheetsConnection)
 spreadsheet="1zu1v-w6KnpB-Mw6D5_ikwL2jrkmzGT_MF6Dpu-J0Y_I"
 
 # Load users data
-@st.cache_data
+#@st.cache_data
 def load_users_data():
     users_data = conn.read(spreadsheet_id = "1zu1v-w6KnpB-Mw6D5_ikwL2jrkmzGT_MF6Dpu-J0Y_I", worksheet="User")
     return pd.DataFrame(users_data)
