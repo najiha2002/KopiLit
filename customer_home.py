@@ -9,10 +9,10 @@ import datetime
 
 # Establish Google Sheets connection
 conn = st.connection("gsheets", type=GSheetsConnection)
-
+spreadsheet = "1zu1v-w6KnpB-Mw6D5_ikwL2jrkmzGT_MF6Dpu-J0Y_I"
 
 def fetch_menu():
-    menu_data = pd.DataFrame(conn.read(worksheet = "Menu"))
+    menu_data = pd.DataFrame(conn.read(spreadsheet_id = spreadsheet, worksheet = "Menu"))
     
 
 # Styling
@@ -329,7 +329,7 @@ def display_menu():
 
 
 def fetch_feedback():
-    feedback_data = pd.DataFrame(conn.read(worksheet="Feedback"))  # Replace "Feedback" with your sheet name
+    feedback_data = pd.DataFrame(conn.read(spreadsheet_id = spreadsheet, worksheet="Feedback"))  # Replace "Feedback" with your sheet name
     return feedback_data
 
 
@@ -414,7 +414,7 @@ def display_footer():
 def check_notifications(username):
     try:
         # Load notifications from the Google Sheets
-        notifications_data = pd.DataFrame(conn.read(worksheet="Notifications"))
+        notifications_data = pd.DataFrame(conn.read(spreadsheet_id = spreadsheet, worksheet="Notifications"))
 
         # Convert the Timestamp column to datetime format
         notifications_data["Timestamp"] = pd.to_datetime(
@@ -442,7 +442,7 @@ def check_notifications(username):
 
 def flow(username):
     # Load user data from Google Sheets
-    user_df = pd.DataFrame(conn.read(worksheet="User"))
+    user_df = pd.DataFrame(conn.read(spreadsheet_id = spreadsheet, worksheet="User"))
     user_data = user_df[user_df['Username'] == username]
     first_name = user_data['First Name'].iloc[0]
 
@@ -467,7 +467,7 @@ def flow(username):
 
     elif navigation == "Orders":
         st.header("Your Orders")
-        orders_data = pd.DataFrame(conn.read(worksheet="Order"))
+        orders_data = pd.DataFrame(conn.read(spreadsheet_id = spreadsheet, worksheet="Order"))
         user_orders = orders_data[orders_data['Username'] == username]
         st.write(user_orders)
 

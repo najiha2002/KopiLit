@@ -4,12 +4,13 @@ from streamlit_gsheets import GSheetsConnection
 
 # Establish Google Sheets connection
 conn = st.connection("gsheets", type=GSheetsConnection)
+spreadsheet = "1zu1v-w6KnpB-Mw6D5_ikwL2jrkmzGT_MF6Dpu-J0Y_I"
 
 # Load feedback data from Google Sheets
 @st.cache_data
 def load_feedback_data():
     try:
-        feedback = conn.read(worksheet="Feedback")
+        feedback = conn.read(spreadsheet_id = spreadsheet, worksheet="Feedback")
         return pd.DataFrame(feedback)
     except Exception as e:
         st.error(f"Error loading feedback data: {e}")
@@ -22,7 +23,7 @@ def save_feedback_data(new_feedback):
         st.cache_data.clear()
         feedback_df = load_feedback_data()
         updated_feedback_df = pd.concat([feedback_df, new_feedback], ignore_index=True)
-        conn.update(worksheet="Feedback", data=updated_feedback_df)
+        conn.update(spreadsheet_id = spreadsheet, worksheet="Feedback", data=updated_feedback_df)
         st.success("Thank you for your feedback!")
         # Clear cache after updating data
         st.cache_data.clear()
@@ -32,7 +33,7 @@ def save_feedback_data(new_feedback):
 # Load user data to get last names
 @st.cache_data
 def load_users_data():
-    users_data = conn.read(worksheet="User")
+    users_data = conn.read(spreadsheet_id = spreadsheet, worksheet="User")
     return pd.DataFrame(users_data)
 
 # Collect customer feedback

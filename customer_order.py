@@ -6,6 +6,7 @@ import datetime
 
 # Create a connection object
 conn = st.connection("gsheets", type=GSheetsConnection)
+spreadsheet = "1zu1v-w6KnpB-Mw6D5_ikwL2jrkmzGT_MF6Dpu-J0Y_I"
 
 # Initialize session state for the cart if it doesn't exist
 if 'cart' not in st.session_state:
@@ -94,7 +95,7 @@ def customer_order(username):
 
             # Check promo code from the Promotion sheet
             try:
-                promotion_data = conn.read(worksheet="Promotion")
+                promotion_data = conn.read(spreadsheet_id = spreadsheet, worksheet="Promotion")
                 promotion_df = pd.DataFrame(promotion_data)
                 if promo_code in promotion_df["name"].values:
                     promo_details = promotion_df[promotion_df["name"] == promo_code].iloc[0]
@@ -194,7 +195,7 @@ def customer_order(username):
 
             try:
                 # Fetch inventory data
-                inventory_data = conn.read(worksheet="Inventory")
+                inventory_data = conn.read(spreadsheet_id = spreadsheet, worksheet="Inventory")
                 inventory_df = pd.DataFrame(inventory_data)
                 inventory_dict = {row['Item']: row['Stock'] for _, row in inventory_df.iterrows()}
 
@@ -227,11 +228,11 @@ def customer_order(username):
                 updated_inventory_df = pd.DataFrame(
                     [{"Item": item, "Stock": stock} for item, stock in inventory_dict.items()]
                 )
-                conn.update(worksheet="Inventory", data=updated_inventory_df)
+                conn.update(spreadsheet_id = spreadsheet, worksheet="Inventory", data=updated_inventory_df)
 
                 # Append orders to sheet
                 updated_orders_df = pd.concat([orders_df, new_order_df], ignore_index=True)
-                conn.update(worksheet="Order", data=updated_orders_df)
+                conn.update(spreadsheet_id = spreadsheet, worksheet="Order", data=updated_orders_df)
                 
 
                 # Clear cart
@@ -245,10 +246,10 @@ def customer_order(username):
                     "Timestamp": datetime.datetime.now()
                 }
 
-                notifications_data = conn.read(worksheet="Notifications")
+                notifications_data = conn.read(spreadsheet_id = spreadsheet, worksheet="Notifications")
                 notifications_df = pd.DataFrame(notifications_data)
                 updated_notifications_df = pd.concat([notifications_df, pd.DataFrame([notification])], ignore_index=True)
-                conn.update(worksheet="Notifications", data=updated_notifications_df)
+                conn.update(spreadsheet_id = spreadsheet, worksheet="Notifications", data=updated_notifications_df)
                 st.cache_data.clear()
                 st.success(
                     f"Order placed successfully! Your booking number is **#{booking_number}**. "

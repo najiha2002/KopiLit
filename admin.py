@@ -7,20 +7,18 @@ import inventory_management
 import analytics_dashboard
 import feedback
 import promotions
-
-
 import datetime
+import datetime
+import pandas as pd
 
 # Establish Google Sheets connection
 conn = st.connection("gsheets", type=GSheetsConnection)
-
-import datetime
-import pandas as pd
+spreadsheet = "1zu1v-w6KnpB-Mw6D5_ikwL2jrkmzGT_MF6Dpu-J0Y_I"
 
 def check_notifications():
     try:
         # Load notifications from the Google Sheets
-        notifications_data = pd.DataFrame(conn.read(worksheet="Notifications"))
+        notifications_data = pd.DataFrame(conn.read(spreadsheet_id = spreadsheet, worksheet="Notifications"))
 
         # Convert the Timestamp column to datetime format using the correct format
         notifications_data["Timestamp"] = pd.to_datetime(notifications_data["Timestamp"], format="%Y-%m-%d %H:%M:%S", errors="coerce")

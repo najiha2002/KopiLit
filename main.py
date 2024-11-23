@@ -13,11 +13,12 @@ import admin
 
 # Google Sheets connection
 conn = st.connection("gsheets", type=GSheetsConnection)
+spreadsheet="1zu1v-w6KnpB-Mw6D5_ikwL2jrkmzGT_MF6Dpu-J0Y_I"
 
 # Load users data
 @st.cache_data
 def load_users_data():
-    users_data = conn.read(spreadsheet_id="1zu1v-w6KnpB-Mw6D5_ikwL2jrkmzGT_MF6Dpu-J0Y_I", worksheet="User")
+    users_data = conn.read(spreadsheet_id = spreadsheet, worksheet="User")
     return pd.DataFrame(users_data)
 
 # Initialize session state variables
@@ -91,7 +92,7 @@ def register():
                 )
                 try:
                     updated_df = pd.concat([users_data, new_user_data], ignore_index=True)
-                    conn.update(worksheet="User", data=updated_df)
+                    conn.update(spreadsheet_id = spreadsheet, worksheet="User", data=updated_df)
                     st.success("✅ Registration successful! Please login to continue.")
                     st.cache_data.clear()
                 except Exception as e:

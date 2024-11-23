@@ -6,15 +6,17 @@ import plotly.express as px
 # Establish Google Sheets connection
 conn = st.connection("gsheets", type=GSheetsConnection)
 
+spreadsheet = "1zu1v-w6KnpB-Mw6D5_ikwL2jrkmzGT_MF6Dpu-J0Y_I"
+
 def analytics():
     st.title("📊 Analytics Dashboard")
     st.write("Real-time insights into current orders, inventory levels, and sales performance.")
 
     # Load data from Google Sheets
     try:
-        sales_data = pd.DataFrame(conn.read(worksheet="Order"))
-        inventory_data = pd.DataFrame(conn.read(worksheet="Inventory"))
-        user_data = pd.DataFrame(conn.read(worksheet="User"))
+        sales_data = pd.DataFrame(conn.read(spreadsheet_id = spreadsheet, worksheet="Order"))
+        inventory_data = pd.DataFrame(conn.read(spreadsheet_id = spreadsheet, worksheet="Inventory"))
+        user_data = pd.DataFrame(conn.read(spreadsheet_id = spreadsheet, worksheet="User"))
     except Exception as e:
         st.error(f"Error loading data: {e}")
         return
@@ -166,7 +168,7 @@ def analytics():
 
     try:
         # Fetch data from the Order sheet
-        orders_data = conn.read(worksheet="Order")
+        orders_data = conn.read(spreadsheet_id = spreadsheet, worksheet="Order")
         orders_df = pd.DataFrame(orders_data)
 
         # Ensure the DataFrame is not empty

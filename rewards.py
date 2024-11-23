@@ -4,13 +4,14 @@ from streamlit_gsheets import GSheetsConnection
 
 # Establish Google Sheets connection
 conn = st.connection("gsheets", type=GSheetsConnection)
+spreadsheet = "1zu1v-w6KnpB-Mw6D5_ikwL2jrkmzGT_MF6Dpu-J0Y_I"
 
 def customer_rewards(username):
     st.title("🎉 Rewards Page")
 
     # Fetch order data from Google Sheets
     try:
-        orders_data = conn.read(worksheet="Order")
+        orders_data = conn.read(spreadsheet_id = spreadsheet, worksheet="Order")
         orders_df = pd.DataFrame(orders_data)
 
         # Filter orders for the specific user

@@ -4,17 +4,18 @@ from streamlit_gsheets import GSheetsConnection
 
 # Establish Google Sheets connection
 conn = st.connection("gsheets", type=GSheetsConnection)
+spreadsheet = "1zu1v-w6KnpB-Mw6D5_ikwL2jrkmzGT_MF6Dpu-J0Y_I"
 
 @st.cache_data
 def load_promotions_data():
     """Load promotions data from Google Sheets."""
-    promotions = conn.read(worksheet="Promotion")
+    promotions = conn.read(spreadsheet_id = spreadsheet, worksheet="Promotion")
     return pd.DataFrame(promotions)
 
 def save_promotions_data(dataframe):
     """Save the entire promotions DataFrame to Google Sheets."""
     try:
-        conn.update(worksheet="Promotion", data=dataframe)
+        conn.update(spreadsheet_id = spreadsheet, worksheet="Promotion", data=dataframe)
     except Exception as e:
         st.error(f"Failed to update promotions: {e}")
 

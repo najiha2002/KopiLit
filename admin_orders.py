@@ -5,6 +5,7 @@ import datetime
 
 # Assuming `conn` is the Google Sheets connection
 conn = st.connection("gsheets", type=GSheetsConnection)
+spreadsheet = "1zu1v-w6KnpB-Mw6D5_ikwL2jrkmzGT_MF6Dpu-J0Y_I"
 
 def view_orders():
     st.title("📋 Admin Dashboard: Customer Orders")
@@ -12,7 +13,7 @@ def view_orders():
 
     # Load order data from Google Sheets
     try:
-        orders_data = conn.read(worksheet="Order")  # Replace with your actual worksheet name
+        orders_data = conn.read(spreadsheet_id = spreadsheet, worksheet="Order")  # Replace with your actual worksheet name
         orders_df = pd.DataFrame(orders_data)
         orders_df['Booking Number'] = orders_df['Booking Number'].astype(int)
         
@@ -65,7 +66,7 @@ def view_orders():
 
                     # Update the Google Sheet with the modified DataFrame
                     try:
-                        conn.update(worksheet="Order", data=orders_df)
+                        conn.update(spreadsheet_id = spreadsheet, worksheet="Order", data=orders_df)
 
                         # Create a new notification for the customer
                         customer_username = order_details["Username"].iloc[0]
@@ -76,12 +77,12 @@ def view_orders():
                             "Timestamp": datetime.datetime.now()
                         }
 
-                        notifications_data = conn.read(worksheet="Notifications")
+                        notifications_data = conn.read(spreadsheet_id = spreadsheet, worksheet="Notifications")
                         notifications_df = pd.DataFrame(notifications_data)
                         new_notifications_df = pd.concat(
                             [notifications_df, pd.DataFrame([notification])], ignore_index=True
                         )
-                        conn.update(worksheet="Notifications", data=new_notifications_df)
+                        conn.update(spreadsheet_id = spreadsheet, worksheet="Notifications", data=new_notifications_df)
 
                         st.success("Order status updated and customer notified!")
 
