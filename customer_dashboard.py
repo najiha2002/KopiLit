@@ -32,7 +32,7 @@ def cust_dash(username):
         # 1. Purchase Trend Over Time
         st.markdown("---")
         st.subheader("📅 Purchase Trend Over Time")
-        user_orders["Timestamp"] = pd.to_datetime(user_orders["Timestamp"])
+        user_orders["Timestamp"] = pd.to_datetime(user_orders["Timestamp"], format='mixed')
         trend_data = user_orders.groupby(user_orders["Timestamp"].dt.date).size().reset_index(name="Orders")
         trend_fig = px.line(
             trend_data,
