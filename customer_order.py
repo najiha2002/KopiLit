@@ -12,7 +12,7 @@ def customer_order(username):
     # Initialize session state for the cart if it doesn't exist
     if 'cart' not in st.session_state:
         st.session_state.cart = []
-        
+
     st.title("☕ Customer Order")
 
     # Coffee menu with emojis
@@ -228,11 +228,11 @@ def customer_order(username):
                 updated_inventory_df = pd.DataFrame(
                     [{"Item": item, "Stock": stock} for item, stock in inventory_dict.items()]
                 )
-                conn.update(spreadsheet_id = spreadsheet, worksheet="Inventory", data=updated_inventory_df)
+                conn.update(worksheet="Inventory", data=updated_inventory_df)
 
                 # Append orders to sheet
                 updated_orders_df = pd.concat([orders_df, new_order_df], ignore_index=True)
-                conn.update(spreadsheet_id = spreadsheet, worksheet="Order", data=updated_orders_df)
+                conn.update(worksheet="Order", data=updated_orders_df)
                 
 
                 # Clear cart
@@ -249,7 +249,7 @@ def customer_order(username):
                 notifications_data = conn.read(spreadsheet_id = spreadsheet, worksheet="Notifications")
                 notifications_df = pd.DataFrame(notifications_data)
                 updated_notifications_df = pd.concat([notifications_df, pd.DataFrame([notification])], ignore_index=True)
-                conn.update(spreadsheet_id = spreadsheet, worksheet="Notifications", data=updated_notifications_df)
+                conn.update(worksheet="Notifications", data=updated_notifications_df)
                 st.cache_data.clear()
                 st.success(
                     f"Order placed successfully! Your booking number is **#{booking_number}**. "
