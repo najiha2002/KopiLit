@@ -65,8 +65,12 @@ def customer_rewards(username):
     st.markdown("### 🛍️ Order History & Points Earned")
     if not user_orders.empty:
         # Display user orders with loyalty points earned
-        user_orders = user_orders[["Booking Number", "Coffee Type", "Quantity", "Final Price", "Loyalty Points"]]
+        user_orders_filtered = user_orders.reset_index()
+        user_orders_filtered = user_orders_filtered[["Booking Number", "Coffee Type", "Quantity", "Final Price", "Loyalty Points"]]
         user_orders.rename(columns={"Final Price": "Total Price"}, inplace=True)
-        st.dataframe(user_orders)
+
+        user_orders_filtered.index = user_orders_filtered.index + 1
+        st.write(user_orders_filtered)
+
     else:
         st.info("No orders found for this account.")

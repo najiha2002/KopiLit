@@ -4,7 +4,7 @@ from streamlit_gsheets import GSheetsConnection
 
 import admin_orders
 import inventory_management
-import analytics_dashboard
+import admin_dashboard
 import feedback
 import promotions
 import datetime
@@ -69,7 +69,7 @@ def flow():
         inventory_management.manage_inventory()
     
     elif navigation == "Analytics":
-        analytics_dashboard.analytics()
+        admin_dashboard.analytics()
 
     elif navigation == "Feedback":
         feedback.view_feedback()

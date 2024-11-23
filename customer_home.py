@@ -3,6 +3,7 @@ import pandas as pd
 import customer_order
 import feedback
 import rewards
+import customer_dashboard
 from streamlit_gsheets import GSheetsConnection
 import datetime
 
@@ -455,7 +456,7 @@ def flow(username):
 
     # Sidebar navigation options
     st.sidebar.title(f"Hi, {first_name}!")
-    navigation = st.sidebar.selectbox("Navigate", ["Home", "Menu", "Orders", "Rewards", "Account"])
+    navigation = st.sidebar.selectbox("Navigate", ["Home", "Menu", "Past Orders", "Rewards", "Feedback"])
 
     if navigation == "Home":
         display_menu()       
@@ -465,17 +466,12 @@ def flow(username):
     elif navigation == "Menu":
         customer_order.customer_order(username)
 
-    elif navigation == "Orders":
-        st.header("Your Orders")
-        orders_data = pd.DataFrame(conn.read(spreadsheet_id = spreadsheet, worksheet="Order"))
-        user_orders = orders_data[orders_data['Username'] == username]
-        st.write(user_orders)
+    elif navigation == "Past Orders":
+        customer_dashboard.cust_dash(username)
 
     elif navigation == "Rewards":
-        st.header("Rewards")
         rewards.customer_rewards(username)
 
-    elif navigation == "Account":
-        st.header("Your Account")
+    elif navigation == "Feedback":
         feedback.collect_feedback()
 

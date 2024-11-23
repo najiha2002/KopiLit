@@ -36,7 +36,10 @@ def view_orders():
             # Filter pending orders for updating status
             st.markdown("---")
             st.markdown("### 🕒 Pending Orders")
+
             pending_orders = orders_df[(orders_df["Status"] != "Completed") & (orders_df["Status"] != "Cancelled")]
+            pending_orders = pending_orders.reset_index(drop=True)
+            pending_orders.index = pending_orders.index + 1
 
             st.dataframe(pending_orders)
 
@@ -101,7 +104,7 @@ def view_orders():
             completed_orders = orders_df[orders_df["Status"] == "Completed"]
             completed_orders ['Formatted Timestamp'] = pd.to_datetime(orders_df["Timestamp"], format='mixed')
             if not completed_orders.empty:
-                st.dataframe(completed_orders.sort_values(by='Formatted Timestamp', ascending=False))
+                st.dataframe(completed_orders.sort_values(by='Formatted Timestamp', ascending=False).reset_index(drop=True))
             else:
                 st.info("No completed orders found.")
 

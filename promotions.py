@@ -36,7 +36,7 @@ def manage_promotions():
             with st.expander(f"Promotion {index + 1}: {row['name']}"):
                 with st.form(f"edit_form_{index}"):
                     # Editable fields for the promotion
-                    promo_name = st.text_input("Promotion Name", value=row["name"])
+                    promo_name = st.text_input("Promotion Code", value=row["name"])
                     promo_desc = st.text_area("Promotion Description", value=row["description"])
                     start_date = st.date_input("Start Date", value=pd.to_datetime(row["start_date"]).date())
                     end_date = st.date_input("End Date", value=pd.to_datetime(row["end_date"]).date())
