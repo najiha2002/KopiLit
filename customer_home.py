@@ -213,10 +213,6 @@ def display_menu():
                     unsafe_allow_html=True,
                 )
                 
-                # Order button with a unique key
-                if st.button(f"Order {row['Name']}", key=f"order-{row['Menu ID']}-{index}"):
-                    st.query_params(page="Menu")  # Navigate to the menu page
-
 
 # styling
     st.markdown(
@@ -375,6 +371,7 @@ def display_feedback():
                     st.session_state["feedback_index"] += 1
         else:
             st.warning("No feedback available.")
+
 
 # Footer Content
 def display_footer():
