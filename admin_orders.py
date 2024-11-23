@@ -49,7 +49,8 @@ def view_orders():
                     pending_orders["Booking Number"].unique(),
                 )
 
-                order_details = orders_df[orders_df["Booking Number"] == booking_num]
+                order_details = orders_df[orders_df["Booking Number"] == booking_num].reset_index(drop=True)
+                order_details.index += 1
                 st.markdown("#### Order Details")
                 st.dataframe(order_details)
 
@@ -104,7 +105,9 @@ def view_orders():
             completed_orders = orders_df[orders_df["Status"] == "Completed"]
             completed_orders ['Formatted Timestamp'] = pd.to_datetime(orders_df["Timestamp"], format='mixed')
             if not completed_orders.empty:
-                st.dataframe(completed_orders.sort_values(by='Formatted Timestamp', ascending=False).reset_index(drop=True))
+                completed_orders = completed_orders.sort_values(by='Formatted Timestamp', ascending=False).reset_index(drop=True)
+                completed_orders.index += 1
+                st.dataframe(completed_orders)
             else:
                 st.info("No completed orders found.")
 
