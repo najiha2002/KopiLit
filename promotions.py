@@ -72,7 +72,7 @@ def manage_promotions():
     # Add new promotion form
     st.subheader("Add New Promotion")
     with st.form("add_promotion"):
-        promo_name = st.text_input("Promotion Name")
+        promo_name = st.text_input("Promotion Code")
         promo_desc = st.text_area("Promotion Description")
         start_date = st.date_input("Start Date")
         end_date = st.date_input("End Date")

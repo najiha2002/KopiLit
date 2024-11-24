@@ -5,7 +5,6 @@ import plotly.express as px
 
 # Establish Google Sheets connection
 conn = st.connection("gsheets", type=GSheetsConnection)
-
 spreadsheet = "1zu1v-w6KnpB-Mw6D5_ikwL2jrkmzGT_MF6Dpu-J0Y_I"
 
 def cust_dash(username):
@@ -22,12 +21,12 @@ def cust_dash(username):
 
         # Display purchase history
         st.header("🛍️ Your Past Orders")
-        user_orders_filtered = user_orders.reset_index()
+        user_orders_filtered = user_orders.sort_values(ascending=False).reset_index()
         user_orders_filtered = user_orders_filtered[['Booking Number', 'Timestamp', 'Coffee Type', 'Size', 'Add-ons', 'Status', 'Quantity', 'Final Price', 'Promo Code', 'Loyalty Points']]
         user_orders_filtered.index = user_orders_filtered.index + 1
         st.write(user_orders_filtered)
 
-        # ---- Add visualizations below ----
+        # ---- Visualizations ----
 
         # 1. Purchase Trend Over Time
         st.markdown("---")
