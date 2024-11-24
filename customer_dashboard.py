@@ -36,7 +36,7 @@ def cust_dash(username):
         trend_data = user_orders.copy()
         trend_data["Date"] = trend_data["Timestamp"].dt.date  # Extract only the date for display
 
-        # Group by Date (not Timestamp)
+        # Group by Date 
         daily_trend_data = trend_data.groupby("Date").size().reset_index(name="Orders")
 
         trend_fig = px.line(
@@ -47,6 +47,12 @@ def cust_dash(username):
             markers=True,
             labels={"Date": "Date", "Orders": "Number of Orders"}
         )
+
+        # Explicitly format the x-axis to show only the date
+        trend_fig.update_xaxes(
+            tickformat="%Y-%m-%d",  # Ensures only the date is displayed
+            title="Date"
+)
         st.plotly_chart(trend_fig, use_container_width=True)
 
         # 2. Breakdown of Payment Methods
