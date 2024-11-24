@@ -32,27 +32,15 @@ def cust_dash(username):
         st.markdown("---")
         st.subheader("📅 Purchase Trend Over Time")
         user_orders["Timestamp"] = pd.to_datetime(user_orders["Timestamp"], format='mixed')
-        # Group data by date while keeping the accurate timestamps for counting orders
-        trend_data = user_orders.copy()
-        trend_data["Date"] = trend_data["Timestamp"].dt.date  # Extract only the date for display
-
-        # Group by Date 
-        daily_trend_data = trend_data.groupby("Date").size().reset_index(name="Orders")
-
+        trend_data = user_orders.groupby(user_orders["Timestamp"].dt.date).size().reset_index(name="Orders")
         trend_fig = px.line(
-            daily_trend_data,
-            x="Date",
+            trend_data,
+            x="Timestamp",
             y="Orders",
             title="Number of Orders Over Time",
             markers=True,
-            labels={"Date": "Date", "Orders": "Number of Orders"}
+            labels={"Timestamp": "Date", "Orders": "Number of Orders"}
         )
-
-        # Explicitly format the x-axis to show only the date
-        trend_fig.update_xaxes(
-            tickformat="%Y-%m-%d",  # Ensures only the date is displayed
-            title="Date"
-)
         st.plotly_chart(trend_fig, use_container_width=True)
 
         # 2. Breakdown of Payment Methods
