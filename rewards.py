@@ -30,7 +30,7 @@ def customer_rewards(username):
         st.markdown(
             f"""
             <div style="
-                background-color: #FFD700; 
+                background-color: #FFF6D6; 
                 color: #000; 
                 border-radius: 10px; 
                 padding: 20px; 
