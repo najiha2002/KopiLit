@@ -21,7 +21,7 @@ def cust_dash(username):
 
         # Display purchase history
         st.header("🛍️ Your Past Orders")
-        user_orders_filtered = user_orders.sort_values(ascending=False).reset_index()
+        user_orders_filtered = user_orders.sort_values(by='Timestamp', ascending=False).reset_index()
         user_orders_filtered = user_orders_filtered[['Booking Number', 'Timestamp', 'Coffee Type', 'Size', 'Add-ons', 'Status', 'Quantity', 'Final Price', 'Promo Code', 'Loyalty Points']]
         user_orders_filtered.index = user_orders_filtered.index + 1
         st.write(user_orders_filtered)
