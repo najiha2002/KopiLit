@@ -26,7 +26,25 @@ def customer_rewards(username):
         total_loyalty_points = user_orders["Loyalty Points"].sum()
 
         st.markdown(f"### 🌟 Hello, {username}!")
-        st.markdown(f"#### You have **{total_loyalty_points}** loyalty points!")
+        # Display loyalty points with a visually appealing card-like style
+        st.markdown(
+            f"""
+            <div style="
+                background-color: #FFD700; 
+                color: #000; 
+                border-radius: 10px; 
+                padding: 20px; 
+                text-align: center; 
+                font-size: 24px; 
+                font-weight: bold;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+                margin: 20px 0;">
+                🌟 You have <span style="color: #8B0000;">{total_loyalty_points}</span> loyalty points! 🌟
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
 
     except Exception as e:
         st.error(f"Error fetching order data: {e}")
