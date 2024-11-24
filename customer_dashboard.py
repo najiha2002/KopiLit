@@ -32,14 +32,20 @@ def cust_dash(username):
         st.markdown("---")
         st.subheader("📅 Purchase Trend Over Time")
         user_orders["Timestamp"] = pd.to_datetime(user_orders["Timestamp"], format='mixed')
-        trend_data = user_orders.groupby(user_orders["Timestamp"].dt.date).size().reset_index(name="Orders")
+        # Group data by date while keeping the accurate timestamps for counting orders
+        trend_data = user_orders.copy()
+        trend_data["Date"] = trend_data["Timestamp"].dt.date  # Extract only the date for display
+
+        # Group by Date (not Timestamp)
+        daily_trend_data = trend_data.groupby("Date").size().reset_index(name="Orders")
+
         trend_fig = px.line(
-            trend_data,
-            x="Timestamp",
+            daily_trend_data,
+            x="Date",
             y="Orders",
             title="Number of Orders Over Time",
             markers=True,
-            labels={"Timestamp": "Date", "Orders": "Number of Orders"}
+            labels={"Date": "Date", "Orders": "Number of Orders"}
         )
         st.plotly_chart(trend_fig, use_container_width=True)
 
