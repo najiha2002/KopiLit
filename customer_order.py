@@ -12,6 +12,8 @@ def customer_order(username):
     # Initialize session state for the cart if it doesn't exist
     if 'cart' not in st.session_state:
         st.session_state.cart = []
+    if 'payment_verified' not in st.session_state:
+        st.session_state.payment_verified = False
 
     st.title("☕ Customer Order")
 
@@ -128,7 +130,7 @@ def customer_order(username):
             # Payment Method Selection
             payment_option = st.radio(
                 "Choose your payment method:",
-                ["Credit/Debit Card", "PayPal", "Cash on Delivery"],
+                ["Credit/Debit Card", "PayPal", "Pay at Counter"],
                 key="payment_method_radio"
             )
 
@@ -147,6 +149,7 @@ def customer_order(username):
                 if st.button("Verify", key="verify_card"):
                         if card_number and card_holder and expiry_date and cvv:
                             st.success(f"Card is valid.")
+                            st.session_state.payment_verified = True
                             payment = "Card"
 
             elif st.session_state.selected_payment_option == "PayPal":
@@ -155,106 +158,112 @@ def customer_order(username):
                 if st.button("Verify", key="verify_paypal"):
                         if paypal_email:
                             st.success(f"Paypal is valid.")
+                            st.session_state.payment_verified = True
                             payment = "PayPal"
 
-            elif st.session_state.selected_payment_option == "Cash on Delivery":
-                payment = "COD"
+            elif st.session_state.selected_payment_option == "Pay at Counter":
+                st.session_state.payment_verified = True
+                payment = "Pay at Counter"
 
         # Place Order button
         if st.button("Place Order ✅"):
 
-            orders_data = conn.read(worksheet="Order")
-            orders_df = pd.DataFrame(orders_data)
+            if not st.session_state.payment_verified:
+                st.error("Payment must be verified before placing the order.")
+            else:
+                orders_data = conn.read(worksheet="Order")
+                orders_df = pd.DataFrame(orders_data)
 
-            # Generate booking details
-            timestamp = datetime.datetime.now()
-            booking_number = str(random.randint(1000, 9999))
-            estimated_time = "5-10 minutes"
+                # Generate booking details
+                timestamp = datetime.datetime.now()
+                booking_number = str(random.randint(1000, 9999))
+                estimated_time = "5-10 minutes"
 
-            # Add cart items to Google Sheets
-            new_orders = []
-            for item in st.session_state.cart:
-                new_orders.append({
-                    "Booking Number": booking_number,
-                    "Timestamp": timestamp,
-                    "Username": username,
-                    "Order Type": "Order",
-                    "Coffee Type": item['Coffee Type'],
-                    "Size": item['Size'],
-                    "Add-ons": item['Add-ons'],
-                    "Quantity": item['Quantity'],
-                    "Status": "Pending",
-                    "Price": total_price,
-                    "Final Price": final_price,
-                    "Promo Code": promo_code,
-                    "Loyalty Points": loyalty_points,
-                    "Payment": st.session_state.selected_payment_option
-                })
-
-            new_order_df = pd.DataFrame(new_orders)
-
-            try:
-                # Fetch inventory data
-                inventory_data = conn.read(spreadsheet_id = spreadsheet, worksheet="Inventory")
-                inventory_df = pd.DataFrame(inventory_data)
-                inventory_dict = {row['Item']: row['Stock'] for _, row in inventory_df.iterrows()}
-
-                # Ingredient requirements
-                ingredient_requirements = {
-                    "Americano": {"Coffee Beans": 1},
-                    "Cappuccino": {"Coffee Beans": 1, "Milk": 0.5},
-                    "Latte": {"Coffee Beans": 1, "Milk": 1},
-                    "Caramel Macchiato": {"Coffee Beans": 1, "Milk": 1, "Caramel Syrup": 0.5},
-                }
-
-                # Calculate total ingredient requirements
-                required_ingredients = {}
+                # Add cart items to Google Sheets
+                new_orders = []
                 for item in st.session_state.cart:
-                    coffee_type = item['Coffee Type']
-                    quantity = item['Quantity']
-                    if coffee_type in ingredient_requirements:
-                        for ingredient, amount in ingredient_requirements[coffee_type].items():
-                            required_ingredients[ingredient] = required_ingredients.get(ingredient, 0) + amount * quantity
+                    new_orders.append({
+                        "Booking Number": booking_number,
+                        "Timestamp": timestamp,
+                        "Username": username,
+                        "Order Type": "Order",
+                        "Coffee Type": item['Coffee Type'],
+                        "Size": item['Size'],
+                        "Add-ons": item['Add-ons'],
+                        "Quantity": item['Quantity'],
+                        "Status": "Pending",
+                        "Price": total_price,
+                        "Final Price": final_price,
+                        "Promo Code": promo_code,
+                        "Loyalty Points": loyalty_points,
+                        "Payment": st.session_state.selected_payment_option
+                    })
 
-                # Check and update inventory
-                for ingredient, required_amount in required_ingredients.items():
-                    if inventory_dict.get(ingredient, 0) < required_amount:
-                        st.error(f"Not enough {ingredient} in stock to fulfill the order.")
-                        return
+                new_order_df = pd.DataFrame(new_orders)
 
-                for ingredient, required_amount in required_ingredients.items():
-                    inventory_dict[ingredient] -= required_amount
+                try:
+                    # Fetch inventory data
+                    inventory_data = conn.read(spreadsheet_id = spreadsheet, worksheet="Inventory")
+                    inventory_df = pd.DataFrame(inventory_data)
+                    inventory_dict = {row['Item']: row['Stock'] for _, row in inventory_df.iterrows()}
 
-                updated_inventory_df = pd.DataFrame(
-                    [{"Item": item, "Stock": stock} for item, stock in inventory_dict.items()]
-                )
-                conn.update(worksheet="Inventory", data=updated_inventory_df)
+                    # Ingredient requirements
+                    ingredient_requirements = {
+                        "Americano": {"Coffee Beans": 1},
+                        "Cappuccino": {"Coffee Beans": 1, "Milk": 0.5},
+                        "Latte": {"Coffee Beans": 1, "Milk": 1},
+                        "Caramel Macchiato": {"Coffee Beans": 1, "Milk": 1, "Caramel Syrup": 0.5},
+                    }
 
-                # Append orders to sheet
-                updated_orders_df = pd.concat([orders_df, new_order_df], ignore_index=True)
-                conn.update(worksheet="Order", data=updated_orders_df)
-                
+                    # Calculate total ingredient requirements
+                    required_ingredients = {}
+                    for item in st.session_state.cart:
+                        coffee_type = item['Coffee Type']
+                        quantity = item['Quantity']
+                        if coffee_type in ingredient_requirements:
+                            for ingredient, amount in ingredient_requirements[coffee_type].items():
+                                required_ingredients[ingredient] = required_ingredients.get(ingredient, 0) + amount * quantity
 
-                # Clear cart
-                st.session_state.cart = []
+                    # Check and update inventory
+                    for ingredient, required_amount in required_ingredients.items():
+                        if inventory_dict.get(ingredient, 0) < required_amount:
+                            st.error(f"Not enough {ingredient} in stock to fulfill the order.")
+                            return
 
-                # Notify admin about the order
-                notification = {
-                    "Recipient": "Admin",
-                    "Sender": username,
-                    "Message": f"New order placed by {username}",
-                    "Timestamp": datetime.datetime.now()
-                }
+                    for ingredient, required_amount in required_ingredients.items():
+                        inventory_dict[ingredient] -= required_amount
 
-                notifications_data = conn.read(spreadsheet_id = spreadsheet, worksheet="Notifications")
-                notifications_df = pd.DataFrame(notifications_data)
-                updated_notifications_df = pd.concat([notifications_df, pd.DataFrame([notification])], ignore_index=True)
-                conn.update(worksheet="Notifications", data=updated_notifications_df)
-                st.cache_data.clear()
-                st.success(
-                    f"Order placed successfully! Your booking number is **#{booking_number}**. "
-                    f"Estimated preparation time: **{estimated_time}**"
-                )
+                    updated_inventory_df = pd.DataFrame(
+                        [{"Item": item, "Stock": stock} for item, stock in inventory_dict.items()]
+                    )
+                    conn.update(worksheet="Inventory", data=updated_inventory_df)
 
-            except Exception as e:
-                st.error(f"An error occurred while updating Google Sheets: {e}")
+                    # Append orders to sheet
+                    updated_orders_df = pd.concat([orders_df, new_order_df], ignore_index=True)
+                    conn.update(worksheet="Order", data=updated_orders_df)
+                    
+
+                    # Clear cart & reset
+                    st.session_state.cart = []
+                    st.session_state.payment_verified = False
+
+                    # Notify admin about the order
+                    notification = {
+                        "Recipient": "Admin",
+                        "Sender": username,
+                        "Message": f"New order placed by {username}",
+                        "Timestamp": datetime.datetime.now()
+                    }
+
+                    notifications_data = conn.read(spreadsheet_id = spreadsheet, worksheet="Notifications")
+                    notifications_df = pd.DataFrame(notifications_data)
+                    updated_notifications_df = pd.concat([notifications_df, pd.DataFrame([notification])], ignore_index=True)
+                    conn.update(worksheet="Notifications", data=updated_notifications_df)
+                    st.cache_data.clear()
+                    st.success(
+                        f"Order placed successfully! Your booking number is **#{booking_number}**. "
+                        f"Estimated preparation time: **{estimated_time}**"
+                    )
+
+                except Exception as e:
+                    st.error(f"An error occurred while updating Google Sheets: {e}")
